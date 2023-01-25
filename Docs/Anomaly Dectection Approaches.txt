@@ -1,0 +1,18 @@
+approaches:
+
+1.bert model training - self defined preprocess layer , encoder-decoder
+results: not classiifying any anamolies due to higly imbalanced data
+no improvement in each epoch
+
+2. bert feature extracting
+	2.1. using hugging face ( small_bert_uncased )
+		# main intension of ML: on using one class svm
+		2.1.1 Applying ML algorithms on features (.... blah blah list)
+		2.1.2 Applying ML algorithms on SMOTE(features)
+		results are shown for 1st review...
+	2.2 planing next on distil_bert_cased, trying include CAPs distinguishability in picture, also distil bert is faster
+
+3. bert - hugging face ( small_bert_uncased ) + ANN (dense layer/neural networks)
+training with making bert as - trainable and non-trainable parameters
+same results: not classiifying any anamolies due to higly imbalanced data
+no improvement in each epoch

@@ -1,0 +1,10 @@
+081109 203615 148 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_38865049064139660 terminating
+081109 203807 222 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-6952295868487656571 terminating
+081109 204005 35 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.73.220:50010 is added to blk_7128370237687728475 size 67108864
+081111 014431 17416 WARN dfs.DataNode$DataXceiver: 10.251.107.98:50010:Got exception while serving blk_-3140031507252212554 to /10.250.7.244:
+081111 020752 17598 INFO dfs.DataNode$DataXceiver: 10.251.125.237:50010 Served block blk_-309134958179110212 to /10.251.125.237
+081111 023039 27 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_3428998332517532825 is added to invalidSet of 10.251.43.192:50010
+081111 023139 19 INFO dfs.FSDataset: Deleting block blk_-7106479503467535906 file /mnt/hadoop/dfs/data/current/subdir32/blk_-3544583377289625738
+081111 064106 33 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/randtxt5/_temporary/_task_200811101024_0012_m_001709_0/part-01709. blk_6054235487623373096
+081111 065258 19 INFO dfs.FSDataset: Deleting block blk_-9169228974826183399 file /mnt/hadoop/dfs/data/current/subdir5/blk_-9169228974826183399
+081111 065303 19 INFO dfs.FSNamesystem: BLOCK* ask 10.250.10.213:50010 to delete  blk_38865049064139660 blk_-5471189807977280544 blk_6708643067868168687 blk_-500678958150296008 blk_-8597840983621849778 blk_-3544583377289625738 blk_-1709606535283888232 blk_-4154362211643572668 blk_-8892080524136798472 blk_5356427838869009345 blk_-6987238639050161133

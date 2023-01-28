@@ -42,9 +42,9 @@ class LogDataset(IterableDataset):
 
     def __iter__(self): ## newly added to be implemented feature
         for idx in range(self.corpus_lines):
-            yield __getitem__(idx)
+            yield self.get_item(idx)
 
-    def __getitem__(self, idx):
+    def get_item(self, idx): ## modified from __getitem__ feature
         k, t = self.log_corpus[idx], self.time_corpus[idx]
 
         k_masked, k_label, t_masked, t_label = self.random_item(k, t)

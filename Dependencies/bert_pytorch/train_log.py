@@ -200,7 +200,7 @@ class Trainer():
                 totol_length = len(data_loader)
                 data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
                 if self.debug:
-                    print("data_loader:",data_loader,"\nlength:",totol_length,"\ndata_iter:",data_iter)
+                    print("data_loader's dataset:",data_loader.dataset,"\nlength:",totol_length,"\ndata_iter:",data_iter)
 
                 for i, data in data_iter:
                     data = {key: value.to(self.device) for key, value in data.items()}

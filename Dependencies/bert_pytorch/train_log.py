@@ -134,9 +134,15 @@ class Trainer():
         # best_center = None
         # best_radius = 0
         # total_dist = None
+        if self.debug:
+            print('x--x '*20)
         for epoch in range(self.epochs):
+            if self.debug:
+                print("epoch:",epoch)
             print("\n")
             if self.hypersphere_loss:
+                if self.debug:
+                    print("calculating hypersphere loss:")
                 center = self.calculate_center([self.train_data_loader, self.valid_data_loader])
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
@@ -178,26 +184,40 @@ class Trainer():
                 break
 
     def calculate_center(self, data_loader_list):
-        print("start calculate center")
+        showlis = "" if not self.debug else " between the data_loader's: "+str(data_loader_list)
+        print("start calculate center",showlis)
         # model = torch.load(self.model_path)
         # model.to(self.device)
-        with torch.no_grad():
+
+        with torch.no_grad(): # disabling the gradient calculation which reduces the memory consumption for computations
             outputs = 0
             total_samples = 0
+            if self.debug: 
+                print("iterating through the data_loader's...")
+                print("<--> "*20)
+
             for data_loader in data_loader_list:
                 totol_length = len(data_loader)
                 data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
+                if self.debug:
+                    print("data_loader:",data_loader,"\nlength:",totol_length,"\ndata_iter:",data_iter)
+
                 for i, data in data_iter:
                     data = {key: value.to(self.device) for key, value in data.items()}
-
                     result = self.trainer.model.forward(data["bert_input"], data["time_input"])
                     cls_output = result["cls_output"]
+                    if self.debug:
+                        print("data_dict:",data,"\nresult_forward:",result)
 
                     outputs += torch.sum(cls_output.detach().clone(), dim=0)
                     total_samples += cls_output.size(0)
 
+            if self.debug:
+                print("<--> "*20)
+                print("outputs:", outputs, "total_samples:",total_samples)
         center = outputs / total_samples
-
+        if self.debug:
+            print("center:",center)
         return center
 
     def plot_train_valid_loss(self, surfix_log):

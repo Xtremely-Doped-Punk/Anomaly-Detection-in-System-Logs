@@ -96,7 +96,19 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
     # only even number of samples
     # test_size += test_size % 2
 
-    valid_size = round(test_size/num_session,3)
+    '''
+    here n->num_session, x->len(data_iter), sr->sample_ratio, v->valid_size, t->test_size, vs=test_split_ratio
+    n = x * sr
+    t = min(n , x * v)
+    => t = min(x * sr , x * v)
+    => t = x * min(sr,v)
+    ts = t/n
+    => vs = [x * min(sr,v)] / [x * sr]
+    => vs = [min(sr,v)] / [sr] 
+    '''
+    #split_size = round(test_size/num_session,3)
+    # (or) to avoid precision loss by applying recall
+    split_size = min(sample_ratio,valid_size)/sample_ratio
     # update split size
 
     print("before filtering short session")
@@ -132,11 +144,12 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
         print('- -'*20)
         print('logkey_seq_pairs:',logkey_seq_pairs)
         print("time_seq_pairs:",time_seq_pairs)
+        print("validation split ratio:",split_size)
 
     logkey_trainset, logkey_validset, time_trainset, time_validset = train_test_split(logkey_seq_pairs,
                                                                                       time_seq_pairs,
-                                                                                      test_size=valid_size,
-                                                                                      random_state=1234)
+                                                                                      test_size=split_size,
+                                                                                      random_state=2023)
 
     # sort seq_pairs by seq len
     train_len = list(map(len, logkey_trainset))

@@ -1,10 +1,17 @@
-from torch.utils.data import Dataset
+''' 
+Before PyTorch 1.2 the only available dataset class was the original “map-style” dataset. 
+This simply requires the user to inherit from the torch.utils.data.Dataset class, 
+source: https://github.com/HelenGuohx/logbert/blob/main/bert_pytorch/dataset/log_dataset.py 
+this class was created compactable with torch 1.11.0v, thus here we will change it to "IterableDataset"
+'''
+#from torch.utils.data import Dataset ## old version
+from torch.utils.data import IterableDataset ## new version
 import torch
 import random
 import numpy as np
 from collections import defaultdict
 
-class LogDataset(Dataset):
+class LogDataset(IterableDataset):
     def __init__(self, log_corpus, time_corpus, vocab, seq_len, corpus_lines=None, encoding="utf-8", on_memory=True, predict_mode=False, mask_ratio=0.15,debug=False):
         """
 

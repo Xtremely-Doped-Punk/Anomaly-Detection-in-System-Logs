@@ -74,7 +74,7 @@ class Trainer():
                                     corpus_lines=self.corpus_lines, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
             print("training log dataset:")
-            print(train_dataset)
+            print(train_dataset.log_corpus)
           
         print("\nLoading valid Dataset")
         # valid_dataset = generate_train_valid(self.output_path + "train", window_size=self.window_size,
@@ -84,7 +84,7 @@ class Trainer():
         valid_dataset = LogDataset(logkey_valid, time_valid, vocab, seq_len=self.seq_len, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
             print("validation log dataset:")
-            print(valid_dataset)
+            print(valid_dataset.log_corpus)
             print()
         
         print("Creating Dataloader")
@@ -200,7 +200,7 @@ class Trainer():
                 totol_length = len(data_loader)
                 data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
                 if self.debug:
-                    print("data_loader's dataset:",data_loader.dataset,"\nlength:",totol_length,"\ndata_iter:",data_iter)
+                    print("data_loader's dataset:",data_loader.dataset,"\nlength:",len(data_loader.dataset),"\ndata_iter:",data_iter)
 
                 for i, data in data_iter:
                     data = {key: value.to(self.device) for key, value in data.items()}

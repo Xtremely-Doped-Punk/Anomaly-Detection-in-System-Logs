@@ -5,7 +5,7 @@ import numpy as np
 from collections import defaultdict
 
 class LogDataset(Dataset):
-    def __init__(self, log_corpus, time_corpus, vocab, seq_len, corpus_lines=None, encoding="utf-8", on_memory=True, predict_mode=False, mask_ratio=0.15):
+    def __init__(self, log_corpus, time_corpus, vocab, seq_len, corpus_lines=None, encoding="utf-8", on_memory=True, predict_mode=False, mask_ratio=0.15,debug=False):
         """
 
         :param corpus: log sessions/line
@@ -28,6 +28,7 @@ class LogDataset(Dataset):
         self.corpus_lines = len(log_corpus)
 
         self.mask_ratio = mask_ratio
+        self.debug = debug
 
     def __len__(self):
         return self.corpus_lines

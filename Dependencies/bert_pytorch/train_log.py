@@ -71,7 +71,7 @@ class Trainer():
                                     )
 
         train_dataset = LogDataset(logkey_train,time_train, vocab, seq_len=self.seq_len,
-                                    corpus_lines=self.corpus_lines, on_memory=self.on_memory, mask_ratio=self.mask_ratio)
+                                    corpus_lines=self.corpus_lines, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
             print("training log dataset:")
             print(train_dataset)
@@ -81,10 +81,10 @@ class Trainer():
         #                              adaptive_window=self.adaptive_window,
         #                              sample_ratio=self.valid_ratio)
 
-        valid_dataset = LogDataset(logkey_valid, time_valid, vocab, seq_len=self.seq_len, on_memory=self.on_memory, mask_ratio=self.mask_ratio)
+        valid_dataset = LogDataset(logkey_valid, time_valid, vocab, seq_len=self.seq_len, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
-            print("training log dataset:")
-            print(train_dataset)
+            print("validation log dataset:")
+            print(valid_dataset)
             print()
         
         print("Creating Dataloader")
@@ -107,14 +107,21 @@ class Trainer():
 
         print("Building BERT model")
         bert = BERT(len(vocab), max_len=self.max_len, hidden=self.hidden, n_layers=self.layers, attn_heads=self.attn_heads,
-                    is_logkey=self.is_logkey, is_time=self.is_time)
+                    is_logkey=self.is_logkey, is_time=self.is_time, debug=self.debug)
+        if self.debug:
+            print("bert instance:",bert)
+            print()
 
         print("Creating BERT Trainer")
         self.trainer = BERTTrainer(bert, len(vocab), train_dataloader=self.train_data_loader, valid_dataloader=self.valid_data_loader,
                               lr=self.lr, betas=(self.adam_beta1, self.adam_beta2), weight_decay=self.adam_weight_decay,
                               with_cuda=self.with_cuda, cuda_devices=self.cuda_devices, log_freq=self.log_freq,
                               is_logkey=self.is_logkey, is_time=self.is_time,
-                              hypersphere_loss=self.hypersphere_loss)
+                              hypersphere_loss=self.hypersphere_loss, debug=self.debug)
+        
+        if self.debug:
+            print("bert-trainner instance:",self.trainer)
+            print()
 
         self.start_iteration(surfix_log="log2")
 

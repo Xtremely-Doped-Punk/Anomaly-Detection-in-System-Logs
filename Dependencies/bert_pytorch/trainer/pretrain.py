@@ -25,7 +25,7 @@ class BERTTrainer:
                  train_dataloader: DataLoader, valid_dataloader: DataLoader = None,
                  lr: float = 1e-4, betas=(0.9, 0.999), weight_decay: float = 0.01, warmup_steps=10000,
                  with_cuda: bool = True, cuda_devices=None, log_freq: int = 10, is_logkey=True, is_time=False,
-                 hypersphere_loss=False):
+                 hypersphere_loss=False, debug=False):
         """
         :param bert: BERT model which you want to train
         :param vocab_size: total word vocab size
@@ -91,6 +91,7 @@ class BERTTrainer:
 
         self.is_logkey = is_logkey
         self.is_time = is_time
+        self.debug = debug
 
     def init_optimizer(self):
         # Setting the Adam optimizer with hyper-param

@@ -40,6 +40,10 @@ class LogDataset(IterableDataset):
     def __len__(self):
         return self.corpus_lines
 
+    def __iter__(self): ## newly added to be implemented feature
+        for idx in range(self.corpus_lines):
+            yield __getitem__(idx)
+
     def __getitem__(self, idx):
         k, t = self.log_corpus[idx], self.time_corpus[idx]
 

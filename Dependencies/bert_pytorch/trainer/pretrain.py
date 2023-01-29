@@ -181,7 +181,7 @@ class BERTTrainer:
         avg_loss = total_loss / totol_length
         self.log[str_code]['epoch'].append(epoch)
         self.log[str_code]['loss'].append(avg_loss)
-        print("Epoch: {} | phase: {}, loss={}".format(epoch, str_code, avg_loss))
+        print("Epoch: {} | phase: {}, loss={}".format(epoch+1, str_code, avg_loss))
         print(f"logkey loss: {total_logkey_loss/totol_length}, hyper loss: {total_hyper_loss/totol_length}\n")
 
         return avg_loss, total_dist

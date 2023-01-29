@@ -179,7 +179,10 @@ class Trainer():
                 print("Early stopping")
                 if self.save_override:
                     print("Saving Model even on Early stopping, save_model override...")
+                    print("=-="*20)
+                    self.trainer.save(self.model_path)
                     self.save_model(total_dist = train_dist + valid_dist)
+                    print("=-="*20)
                 break
 
     def save_model(self, total_dist):
@@ -251,8 +254,9 @@ class Trainer():
 
         if self.debug:
             print("<--> "*20)
-            print("\nfinal_outputs (sum of result['cls_output'] tensor):", outputs)
-            print("total_samples (no.of times):",total_samples)
+            print("\nfinal_outputs (sum of result['cls_output'] tensor):")
+            print(outputs)
+            print("\ntotal_samples (no.of times):",total_samples)
             print()
 
         center = outputs / total_samples

@@ -108,7 +108,7 @@ class BERTTrainer:
         """
         loop over the data_loader for training or validing
         if on train status, backward operation is activated
-        and also auto save the model every peoch
+        and also auto save the model every epoch
 
         :param epoch: current epoch index
         :param data_loader: torch.utils.data.DataLoader for iteration
@@ -205,12 +205,10 @@ class BERTTrainer:
         """
         torch.save(self.model, save_dir)
         # self.bert.to(self.device)
-        print(" Model Saved on:", save_dir)
+        print("Model Saved on:", save_dir)
         return save_dir
 
     @staticmethod
     def get_radius(dist: list, nu: float):
         """Optimally solve for radius R via the (1-nu)-quantile of distances."""
         return np.quantile(np.sqrt(dist), 1 - nu)
-
-

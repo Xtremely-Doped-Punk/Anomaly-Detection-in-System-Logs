@@ -1,4 +1,5 @@
 from torch.utils.data import DataLoader
+from torch.utils.data.dataloader import _DatasetKind
 from bert_pytorch.model import BERT
 from bert_pytorch.trainer import BERTTrainer
 from bert_pytorch.dataset import LogDataset, WordVocab
@@ -49,6 +50,9 @@ class Trainer():
         self.mask_ratio = options["mask_ratio"]
         self.min_len = options['min_len']
         self.debug = options["debug"]
+        self.show_tensors = options["show_tensors"]
+        self.min_no_of_epochs_to_save = options["min_no_of_epochs_to_save"] # save model after 10 warm up epochs
+        self.save_override = options["save_on_early_stop"]
 
         print("Save options parameters")
         save_parameters(options, self.model_dir + "parameters.txt")
@@ -138,7 +142,7 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                print("epoch:",epoch)
+                print("<<<","="*15,"epoch:",epoch+1,"="*15,">>>")
             print("\n")
             if self.hypersphere_loss:
                 if self.debug:
@@ -147,41 +151,51 @@ class Trainer():
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
 
-            _, train_dist = self.trainer.train(epoch)
-            avg_loss, valid_dist = self.trainer.valid(epoch)
+            avg_train_loss, train_dist = self.trainer.train(epoch)
+            avg_valid_loss, valid_dist = self.trainer.valid(epoch)
             self.trainer.save_log(self.model_dir, surfix_log)
+
+            if self.debug:
+                print("epoch training complete...")
+                print("avg_train_loss:",avg_train_loss,"train_dist:",train_dist)
+                print("avg_train_loss",avg_valid_loss,"valid_dist",valid_dist)
 
             if self.hypersphere_loss:
                 self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
+                if self.debug:
+                    print("new trainer.radius:",self.trainer.radius)
 
-            # save model after 10 warm up epochs
-            if avg_loss < best_loss:
-                best_loss = avg_loss
+            if avg_valid_loss < best_loss:
+                best_loss = avg_valid_loss
                 self.trainer.save(self.model_path)
                 epochs_no_improve = 0
 
-                if epoch > 10 and self.hypersphere_loss:
-                    best_center = self.trainer.hyper_center
-                    best_radius = self.trainer.radius
-                    total_dist = train_dist + valid_dist
-
-                    if best_center is None:
-                        raise TypeError("center is None")
-
-                    print("best radius", best_radius)
-                    best_center_path = self.model_dir + "best_center.pt"
-                    print("Save best center", best_center_path)
-                    torch.save({"center": best_center, "radius": best_radius}, best_center_path)
-
-                    total_dist_path = self.model_dir + "best_total_dist.pt"
-                    print("save total dist: ", total_dist_path)
-                    torch.save(total_dist, total_dist_path)
+                if epoch > self.min_no_of_epochs_to_save and self.hypersphere_loss:
+                    self.save_model(total_dist = train_dist + valid_dist)
             else:
                 epochs_no_improve += 1
 
-            if epochs_no_improve == self.n_epochs_stop:
+            if epochs_no_improve >= self.n_epochs_stop:
                 print("Early stopping")
+                if self.save_override:
+                    print("Saving Model even on Early stopping, save_model override...")
+                    self.save_model(total_dist = train_dist + valid_dist)
                 break
+
+    def save_model(self, total_dist):
+        best_center = self.trainer.hyper_center
+        best_radius = self.trainer.radius
+        if best_center is None:
+            raise TypeError("center is None")
+
+        print("best radius", best_radius)
+        best_center_path = self.model_dir + "best_center.pt"
+        print("Save best center", best_center_path)
+        torch.save({"center": best_center, "radius": best_radius}, best_center_path)
+
+        total_dist_path = self.model_dir + "best_total_dist.pt"
+        print("save total dist: ", total_dist_path)
+        torch.save(total_dist, total_dist_path)
 
     def calculate_center(self, data_loader_list):
         showlis = "" if not self.debug else " between the data_loader's: "+str(data_loader_list)
@@ -199,37 +213,57 @@ class Trainer():
             for data_loader in data_loader_list:
                 totol_length = len(data_loader)
                 if self.debug:
+                    print("\n","*-*"*30)
+                    print("no.of batches:",totol_length,"as batch_size:",data_loader.batch_size)
+                    print("dataset_kind:",data_loader._dataset_kind, "=> is iteratable kind:", data_loader._dataset_kind == _DatasetKind.Iterable)
+                    print("data_loader's dataset:",data_loader.dataset)
+                    print("dataset_length:",len(data_loader.dataset), "=> _IterableDataset_len_called:",data_loader._IterableDataset_len_called, "\t is drop_last:",data_loader.drop_last)
                     print()
+                   
                 data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
-                if self.debug:
-                    print()
-                if self.debug:
-                    print("data_loader's dataset:",data_loader.dataset,"\nlength:",len(data_loader.dataset),"\ndata_iter:",data_iter)
-                    print("totol_length:",totol_length,"dataset_kind:",data_loader._dataset_kind)
 
                 for i, data in data_iter:
                     data = {key: value.to(self.device) for key, value in data.items()}
                     result = self.trainer.model.forward(data["bert_input"], data["time_input"])
                     cls_output = result["cls_output"]
+
                     if self.debug:
-                        print("data_dict:",data,"\nresult_forward:",result)
+                        print()
+                        #data_shapes = {key:value.shape for key,value in data.items() if value is not None}
+                        #print(i,"--> data_dict_shapes:",data_shapes)
+                        if not self.show_tensors:
+                            torch.set_printoptions(threshold=10_000)
+                        print(i,"--> data_dict:",data)
+                        result_shapes = {key:value.shape for key,value in result.items() if value is not None}
+                        print("result_forward_shapes:",result_shapes)
+                    if self.show_tensors:
+                        print()
+                        print("Trainer Model's result on forward training:")
+                        for k,v in result.items():
+                            print(k+":")
+                            print(v)
 
                     outputs += torch.sum(cls_output.detach().clone(), dim=0)
                     total_samples += cls_output.size(0)
 
-            if self.debug:
-                print("<--> "*20)
-                print("outputs:", outputs, "total_samples:",total_samples)
+                if self.debug:
+                    print()
+
+        if self.debug:
+            print("<--> "*20)
+            print("\nfinal_outputs:", outputs, "\ntotal_samples:",total_samples)
+            print()
+
         center = outputs / total_samples
         if self.debug:
-            print("center:",center)
+            print("center calculated as outputs/total_samples")
         return center
 
     def plot_train_valid_loss(self, surfix_log):
         train_loss = pd.read_csv(self.model_dir + f"train{surfix_log}.csv")
         valid_loss = pd.read_csv(self.model_dir + f"valid{surfix_log}.csv")
-        sns.lineplot(x="epoch", y="loss", data=train_loss, label="train loss")
-        sns.lineplot(x="epoch", y="loss", data=valid_loss, label="valid loss")
+        sns.lineplot(x="epoch", y="loss", data=train_loss, label="train loss",markers=True,)
+        sns.lineplot(x="epoch", y="loss", data=valid_loss, label="valid loss",markers=True,)
         plt.title("epoch vs train loss vs valid loss")
         plt.legend()
         plt.savefig(self.model_dir + "train_valid_loss.png")

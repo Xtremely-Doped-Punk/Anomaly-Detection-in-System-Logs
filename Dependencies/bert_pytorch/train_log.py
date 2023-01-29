@@ -251,12 +251,13 @@ class Trainer():
 
         if self.debug:
             print("<--> "*20)
-            print("\nfinal_outputs:", outputs, "\ntotal_samples:",total_samples)
+            print("\nfinal_outputs (sum of result['cls_output'] tensor):", outputs)
+            print("total_samples (no.of times):",total_samples)
             print()
 
         center = outputs / total_samples
         if self.debug:
-            print("center calculated as outputs/total_samples")
+            print("center calculated as sum of outputs by total no.of samples,i.e., average of all the result['cls_output']")
         return center
 
     def plot_train_valid_loss(self, surfix_log):

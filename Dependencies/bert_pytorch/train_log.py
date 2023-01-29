@@ -142,7 +142,7 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                print("<<<","="*15,"epoch:",epoch+1,"="*15,">>>")
+                print("\n<<<","="*25,"epoch:",epoch+1,"="*25,">>>")
             print("\n")
             if self.hypersphere_loss:
                 if self.debug:

@@ -38,8 +38,7 @@ class LogDataset(IterableDataset):
         self.debug = debug
 
     def get_data(self):
-        if !debug: return
-    else return {'log_corpus':log_corpus,'time_corpus':time_corpus}
+        return {'log_corpus':log_corpus,'time_corpus':time_corpus}
 
     def __len__(self):
         return self.corpus_lines

@@ -53,6 +53,8 @@ class Trainer():
         self.show_tensors = options["show_tensors"]
         self.min_no_of_epochs_to_save = options["min_no_of_epochs_to_save"] # save model after 10 warm up epochs
         self.save_override = options["save_on_early_stop"]
+        self.show_each_epoch_inp = options["show_each_epoch_inp"]
+        self.show_each_epoch_out = options["show_each_epoch_out"]
 
         print("Save options parameters")
         save_parameters(options, self.model_dir + "parameters.txt")
@@ -107,10 +109,11 @@ class Trainer():
         gc.collect() #  run a collection cycle manually after delete operations
 
         if self.debug:
-            print("\ntrain_data_loader's batch iteration's get_item() funcationality for batch[0]:")
-            print(self.train_data_loader[0])
-            print("\nvalid_data_loader's batch iteration's get_item() funcationality for batch[0]:")
-            print(self.valid_data_loader[0])
+            get_item_on_train_sample = self.train_data_loader.dataset.get_item(0)
+            print("\ntrain_data_loader's batch iteration's get_item() funcationality for sample[idx=0]:",get_item_on_train_sample )
+            get_item_on_valid_sample = self.train_data_loader.dataset.get_item(0)
+            print("\nvalid_data_loader's batch iteration's get_item() funcationality for sample[idx=0]:",get_item_on_valid_sample)
+            print(self.valid_data_loader.dataset.get_item(0))
             # turn off debuging in dataset, as we just want to see its working for one instance and it is already illustrated above
             self.train_data_loader.dataset.debug=False
             self.valid_data_loader.dataset.debug=False
@@ -183,6 +186,8 @@ class Trainer():
                 epochs_no_improve += 1
 
             if epochs_no_improve >= self.n_epochs_stop:
+                if self.debug:
+                    print()
                 print("Early stopping")
                 if self.save_override:
                     print("Saving Model even on Early stopping, save_model override...")
@@ -237,12 +242,10 @@ class Trainer():
                     result = self.trainer.model.forward(data["bert_input"], data["time_input"])
                     cls_output = result["cls_output"]
 
-                    if self.debug:
+                    if self.show_each_epoch_inp:
                         print()
                         #data_shapes = {key:value.shape for key,value in data.items() if value is not None}
                         #print(i,"--> data_dict_shapes:",data_shapes)
-                        if not self.show_tensors:
-                            torch.set_printoptions(threshold=10_000)
                         print(i,"--> data_dict:",data)
                         result_shapes = {key:value.shape for key,value in result.items() if value is not None}
                         print("result_forward_shapes:",result_shapes)
@@ -261,7 +264,9 @@ class Trainer():
 
         if self.debug:
             print("<--> "*20)
-            print("\nfinal_outputs (sum of result['cls_output'] tensor):")
+            print()
+        if self.show_each_epoch_out:
+            print("final_outputs (sum of result['cls_output'] tensor):")
             print(outputs)
             print("\ntotal_samples (no.of times):",total_samples)
             print()

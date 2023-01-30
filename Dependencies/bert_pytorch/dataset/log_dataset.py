@@ -50,7 +50,7 @@ class LogDataset(IterableDataset):
     def get_item(self, idx): ## modified from __getitem__ feature
         k, t = self.log_corpus[idx], self.time_corpus[idx]
         if self.debug:
-            print("<="*10,"LogDataset.iteration get_item() functionality debug, given index:"+idx,"=>"*10)
+            print("\n","<="*5,"LogDataset.iteration get_item() functionality debugging for given index:"+str(idx),"=>"*5)
             print(f"log_corpus[idx] = '{k}'")
             print(f"time_corpus[idx] = '{t}'")
 
@@ -67,6 +67,12 @@ class LogDataset(IterableDataset):
 
         t = [0] + t_masked
         t_label = [self.vocab.pad_index] + t_label
+
+        if self.debug:
+            print("new k = adding 'sos_index' to start of k_masked list =>",k)
+            print("new k_label = adding 'pad_index' to start of k_label list =>",k_label)
+            print("new t = adding '0' to start of t_masked list =>",t)
+            print("new t_label = adding 'pad_index' to start of t_label list =>",t_label)
 
         return k, k_label, t, t_label
 
@@ -97,14 +103,14 @@ class LogDataset(IterableDataset):
             time_int = time_intervals[i]
             prob = random.random()
             if self.debug:
-                print("random prob:",prob)
+                print(f"==> idx:{i}; random prob:{prob}for token:{token}")
 
             # replace 15% of tokens in a sequence to a masked token
             if prob < self.mask_ratio:
                 # raise AttributeError("no mask in visualization")
                 if self.debug:
-                    print("replacing this token in the sequence to a masked token as its rand_prob falls under mask_prob")
-                    print("time_intervals[i] = 0, i.e. mask_value and corresponding time_label[i] = time_label[i], (resp time_interval value)")
+                    print("\nreplacing this token in the sequence to a masked token as its rand_prob falls under mask_prob")
+                    print(f"time_intervals[{i}] = 0, i.e. mask_value and corresponding time_label[{i}] = time_label[{i}], (resp time_interval value)")
 
                 if self.predict_mode:
                     tokens[i] = self.vocab.mask_index
@@ -116,8 +122,8 @@ class LogDataset(IterableDataset):
                     if self.debug:
                         print("Prediction Mode Override"+("..." if not predict_mode_debug_once else ""))
                         if predict_mode_debug_once:
-                            print(f"token[i] = {tokens[i]}, (i.e. masked index)")
-                            print(f"corresponding output_label[i] = {output_label[-1]}, (i.e. resp int label index in 'stoi', if not found)")
+                            print(f"token[{i}] = {tokens[i]}, (i.e. masked index)")
+                            print(f"corresponding output_label[{i}] = {output_label[-1]}, (i.e. resp int label index in 'stoi', if not found)")
                             predict_mode_debug_once = False
                     continue
 
@@ -153,8 +159,8 @@ class LogDataset(IterableDataset):
                 output_label.append(0)
                 time_label.append(0)
                 if self.debug:
-                    print("replacing this token in the sequence to a corresponding_int_label_index as its rand_prob doesn't fall under mask_prob")
-                    print(f" i.e., token[i] = {token[i]} and corresponding output_label[i] = 0")
+                    print("\nreplacing this token in the sequence to a corresponding_int_label_index as its rand_prob doesn't fall under mask_prob")
+                    print(f" i.e., token[i] = {tokens[i]} and corresponding output_label[i] = 0")
                     print("time_intervals[i] remains unchanged, and corresponding time_label[i] = 0")
 
         return tokens, output_label, time_intervals, time_label

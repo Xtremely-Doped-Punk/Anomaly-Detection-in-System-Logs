@@ -77,10 +77,12 @@ class Trainer():
         train_dataset = LogDataset(logkey_train,time_train, vocab, seq_len=self.seq_len,
                                     corpus_lines=self.corpus_lines, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
-            print("training log dataset:")
-            print(train_dataset.log_corpus)
+            print("loading complete...")
+            print("<"*25,">"*25,)
+            print("\ntraining log dataset:")
+            print(train_dataset.get_data())
           
-        print("\nLoading valid Dataset")
+        print("\nLoading Validation Dataset")
         # valid_dataset = generate_train_valid(self.output_path + "train", window_size=self.window_size,
         #                              adaptive_window=self.adaptive_window,
         #                              sample_ratio=self.valid_ratio)
@@ -88,7 +90,7 @@ class Trainer():
         valid_dataset = LogDataset(logkey_valid, time_valid, vocab, seq_len=self.seq_len, on_memory=self.on_memory, mask_ratio=self.mask_ratio, debug=self.debug)
         if self.debug:
             print("validation log dataset:")
-            print(valid_dataset.log_corpus)
+            print(valid_dataset.get_data())
             print()
         
         print("Creating Dataloader")
@@ -105,8 +107,12 @@ class Trainer():
         gc.collect() #  run a collection cycle manually after delete operations
 
         if self.debug:
-            print("train_data_loader:",self.train_data_loader)
-            print("valid_data_loader:",self.valid_data_loader)
+            print("\ntrain_data_loader's batch iteration:")
+            for batch in train_data_loader:
+                print(batch)
+            print("\nvalid_data_loader's batch iteration:")
+            for batch in train_data_loader:
+                print(batch)
             print()
 
         print("Building BERT model")

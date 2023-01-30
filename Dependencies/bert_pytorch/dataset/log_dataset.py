@@ -38,7 +38,7 @@ class LogDataset(IterableDataset):
         self.debug = debug
 
     def get_data(self):
-        return {'log_corpus':log_corpus,'time_corpus':time_corpus}
+        return {'log_corpus':self.log_corpus,'time_corpus':self.time_corpus}
 
     def __len__(self):
         return self.corpus_lines
@@ -49,8 +49,16 @@ class LogDataset(IterableDataset):
 
     def get_item(self, idx): ## modified from __getitem__ feature
         k, t = self.log_corpus[idx], self.time_corpus[idx]
+        if self.debug:
+            print("<="*10,"LogDataset.iteration get_item() functionality debug, given index:"+idx,"=>"*10)
+            print(f"log_corpus[idx] = '{k}'")
+            print(f"time_corpus[idx] = '{t}'")
 
         k_masked, k_label, t_masked, t_label = self.random_item(k, t)
+        if self.debug:
+            print("~"*50,"\n")
+            print("k_masked:",k_masked,"\tk_label:" ,k_label)
+            print("t_masked:" ,t_masked,"\tt_label:", t_label)
 
         # [CLS] tag = SOS tag, [SEP] tag = EOS tag
         k = [self.vocab.sos_index] + k_masked
@@ -68,13 +76,35 @@ class LogDataset(IterableDataset):
 
         time_intervals = list(t)
         time_label = []
+        if self.debug:
+            print("\nrandomly masking item... given masking probability:",self.mask_ratio)
+            print("tokens:",tokens)
+            print("time_intervals:",time_intervals)
+            print("~"*50)
+        
+        """ 
+        refer vocab.py: class Vocab; default special tokens are already integer labeled:
+        
+        vocab.pad_index = 0
+        vocab.unk_index = 1
+        vocab.eos_index = 2
+        vocab.sos_index = 3
+        vocab.mask_index = 4
+        """
+        predict_mode_debug_once = True
 
         for i, token in enumerate(tokens):
             time_int = time_intervals[i]
             prob = random.random()
+            if self.debug:
+                print("random prob:",prob)
+
             # replace 15% of tokens in a sequence to a masked token
             if prob < self.mask_ratio:
                 # raise AttributeError("no mask in visualization")
+                if self.debug:
+                    print("replacing this token in the sequence to a masked token as its rand_prob falls under mask_prob")
+                    print("time_intervals[i] = 0, i.e. mask_value and corresponding time_label[i] = time_label[i], (resp time_interval value)")
 
                 if self.predict_mode:
                     tokens[i] = self.vocab.mask_index
@@ -82,21 +112,36 @@ class LogDataset(IterableDataset):
 
                     time_label.append(time_int)
                     time_intervals[i] = 0
+
+                    if self.debug:
+                        print("Prediction Mode Override"+("..." if not predict_mode_debug_once else ""))
+                        if predict_mode_debug_once:
+                            print(f"token[i] = {tokens[i]}, (i.e. masked index)")
+                            print(f"corresponding output_label[i] = {output_label[-1]}, (i.e. resp int label index in 'stoi', if not found)")
+                            predict_mode_debug_once = False
                     continue
 
                 prob /= self.mask_ratio
+                if self.debug:
+                    print("prob percent, i.e. rand_prob/mask_prob =",prob)
 
                 # 80% randomly change token to mask token
                 if prob < 0.8:
                     tokens[i] = self.vocab.mask_index
+                    if self.debug:
+                        print(f"falls under first 80%, i.e. token[{i}] converted to mask_index = {tokens[i]}")
 
                 # 10% randomly change token to random token
                 elif prob < 0.9:
                     tokens[i] = random.randrange(len(self.vocab))
+                    if self.debug:
+                        print(f"falls under second 10%, i.e. token[{i}] converted to random_int_label_index = {tokens[i]}")
 
                 # 10% randomly change token to current token
                 else:
                     tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
+                    if self.debug:
+                        print(f"falls under last 10%, i.e. token[{i}] converted to corresponding_int_label_index = {tokens[i]}")
 
                 output_label.append(self.vocab.stoi.get(token, self.vocab.unk_index))
 
@@ -107,6 +152,10 @@ class LogDataset(IterableDataset):
                 tokens[i] = self.vocab.stoi.get(token, self.vocab.unk_index)
                 output_label.append(0)
                 time_label.append(0)
+                if self.debug:
+                    print("replacing this token in the sequence to a corresponding_int_label_index as its rand_prob doesn't fall under mask_prob")
+                    print(f" i.e., token[i] = {token[i]} and corresponding output_label[i] = 0")
+                    print("time_intervals[i] remains unchanged, and corresponding time_label[i] = 0")
 
         return tokens, output_label, time_intervals, time_label
 

@@ -78,8 +78,8 @@ class TorchVocab(object):
         self.stoi = {tok: i for i, tok in enumerate(self.itos)}
         
         if(self.debug):
-            print("Final List of Special Tokens:",self.itos)
-            print("Switching Keys and Values:",self.stoi)
+            print("Final List of Special Tokens ('itos'):",self.itos)
+            print("Integer Label Dict Map ('stoi'):",self.stoi)
 
         self.vectors = None
         if vectors is not None:

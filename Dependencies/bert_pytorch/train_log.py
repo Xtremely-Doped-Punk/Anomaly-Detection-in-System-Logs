@@ -107,12 +107,13 @@ class Trainer():
         gc.collect() #  run a collection cycle manually after delete operations
 
         if self.debug:
-            print("\ntrain_data_loader's batch iteration:")
-            for batch in train_data_loader:
-                print(batch)
-            print("\nvalid_data_loader's batch iteration:")
-            for batch in train_data_loader:
-                print(batch)
+            print("\ntrain_data_loader's batch iteration's get_item() funcationality for batch[0]:")
+            print(self.train_data_loader[0])
+            print("\nvalid_data_loader's batch iteration's get_item() funcationality for batch[0]:")
+            print(self.valid_data_loader[0])
+            # turn off debuging in dataset, as we just want to see its working for one instance and it is already illustrated above
+            self.train_data_loader.dataset.debug=False
+            self.valid_data_loader.dataset.debug=False
             print()
 
         print("Building BERT model")

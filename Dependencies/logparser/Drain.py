@@ -275,9 +275,9 @@ class LogParser:
             if self.debug:
                 print("Finding the parameter_list for the resp places of '<*>' in log-template...")
             self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
-        self.df_log.to_csv(os.path.join(self.savePath, self.logName + '_structured.csv'), index=False)
+        self.df_log.to_csv(os.path.join(self.savePath, 'structured.csv'), index=False)
 
-        df_event.to_csv(os.path.join(self.savePath, self.logName + '_templates.csv'), index=False)
+        df_event.to_csv(os.path.join(self.savePath,'templates.csv'), index=False)
         # commented as it is done 2 times unnecessarily
         '''
         occ_dict = dict(self.df_log['EventTemplate'].value_counts())

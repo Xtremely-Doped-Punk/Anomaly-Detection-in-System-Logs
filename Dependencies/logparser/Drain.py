@@ -272,6 +272,8 @@ class LogParser:
         # self.df_log is converted to => 'log_name' +  '_structured.csv'
 
         if self.keep_para: # if we want the actual parameters also in the resp places of '<*>' in log-template
+            if self.debug:
+                print("Finding the parameter_list for the resp places of '<*>' in log-template...")
             self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
         self.df_log.to_csv(os.path.join(self.savePath, self.logName + '_structured.csv'), index=False)
 
@@ -446,8 +448,8 @@ class LogParser:
         # fix can be seen in under pull request section https://github.com/logpai/logparser/pull/86
         template_regex = "^" + template_regex.replace("\<\*\>", "(.*?)") + "$"
         if self.debug:
+            print("\ncontent:",row["Content"])
             print("template_regex final:", template_regex)
-            print("content:",row["Content"])
         parameter_list = re.findall(template_regex, row["Content"])
         parameter_list = parameter_list[0] if parameter_list else ()
         parameter_list = list(parameter_list) if isinstance(parameter_list, tuple) else [parameter_list]

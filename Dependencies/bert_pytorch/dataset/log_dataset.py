@@ -103,13 +103,13 @@ class LogDataset(IterableDataset):
             time_int = time_intervals[i]
             prob = random.random()
             if self.debug:
-                print(f"==> idx:{i}; random prob:{prob}for token:{token}")
+                print(f"\n==> idx:{i}; random prob:{prob}for token:{token}")
 
             # replace 15% of tokens in a sequence to a masked token
             if prob < self.mask_ratio:
                 # raise AttributeError("no mask in visualization")
                 if self.debug:
-                    print("\nreplacing this token in the sequence to a masked token as its rand_prob falls under mask_prob")
+                    print("replacing this token in the sequence to a masked token as its rand_prob falls under mask_prob")
                     print(f"time_intervals[{i}] = 0, i.e. mask_value and corresponding time_label[{i}] = time_label[{i}], (resp time_interval value)")
 
                 if self.predict_mode:
@@ -159,7 +159,7 @@ class LogDataset(IterableDataset):
                 output_label.append(0)
                 time_label.append(0)
                 if self.debug:
-                    print("\nreplacing this token in the sequence to a corresponding_int_label_index as its rand_prob doesn't fall under mask_prob")
+                    print("replacing this token in the sequence to a corresponding_int_label_index as its rand_prob doesn't fall under mask_prob")
                     print(f" i.e., token[i] = {tokens[i]} and corresponding output_label[i] = 0")
                     print("time_intervals[i] remains unchanged, and corresponding time_label[i] = 0")
 

@@ -79,6 +79,7 @@ class Predictor():
         self.test_ratio = options["test_ratio"]
         self.mask_ratio = options["mask_ratio"]
         self.min_len=options["min_len"]
+        self.debug = options["debug"]
 
     def detect_logkey_anomaly(self, masked_output, masked_label):
         num_undetected_tokens = 0
@@ -244,11 +245,23 @@ class Predictor():
             with open(self.model_dir + "error_dict.pkl", 'rb') as f:
                 error_dict = pickle.load(f)
 
+            if self.debug:
+                print("loading is_time data available...")
+                print("scale:",scale)
+                print("error_dict:",error_dict)
+                print()
+
         if self.hypersphere_loss:
             center_dict = torch.load(self.model_dir + "best_center.pt")
             self.center = center_dict["center"]
             self.radius = center_dict["radius"]
             # self.center = self.center.view(1,-1)
+
+            if self.debug:
+                print("loading hypersphere_loss data available...")
+                print("center:",self.center)
+                print("radius:",self.radius)
+                print()
 
 
         print("test normal predicting")

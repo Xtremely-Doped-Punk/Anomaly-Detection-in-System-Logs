@@ -66,7 +66,7 @@ class Trainer():
         print("vocab Size: ", len(vocab))
 
         print("\nLoading Train Dataset")
-        logkey_train, logkey_valid, time_train, time_valid = generate_train_valid(self.output_path + "train", window_size=self.window_size,
+        logkey_train, logkey_valid, time_train, time_valid = generate_train_valid(self.output_path + "train.data", window_size=self.window_size,
                                      adaptive_window=self.adaptive_window,
                                      valid_size=self.valid_ratio,
                                      sample_ratio=self.sample_ratio,

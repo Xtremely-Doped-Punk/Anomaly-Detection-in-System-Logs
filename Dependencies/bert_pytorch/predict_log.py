@@ -252,10 +252,10 @@ class Predictor():
 
 
         print("test normal predicting")
-        test_normal_results, test_normal_errors = self.helper(model, self.output_dir, "test_normal", vocab, scale, error_dict)
+        test_normal_results, test_normal_errors = self.helper(model, self.output_dir, "test_normal.data", vocab, scale, error_dict)
 
         print("test abnormal predicting")
-        test_abnormal_results, test_abnormal_errors = self.helper(model, self.output_dir, "test_abnormal", vocab, scale, error_dict)
+        test_abnormal_results, test_abnormal_errors = self.helper(model, self.output_dir, "test_abnormal.data", vocab, scale, error_dict)
 
         print("Saving test normal results")
         with open(self.model_dir + "test_normal_results", "wb") as f:

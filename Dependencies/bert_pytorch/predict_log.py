@@ -91,6 +91,7 @@ class Predictor():
             print("masked_output:",masked_output)
             print("masked_label:",masked_label)
             print("no.of candidates given:",self.num_candidates)
+            iter_possib = True
             if len(masked_label)==0:
                 print("as the masked_label is empty, no.of undetected_tokens is none; skiping...")
                 iter_possib = False
@@ -279,7 +280,7 @@ class Predictor():
 
                 if idx < 10 or idx % 1000 == 0:
                     if self.debug:
-                        print("FINAL RESULT:", end=" ")
+                        print("\nFINAL RESULT:", end=" ")
                     print(
                         "{}, #time anomaly: {} # of undetected_tokens: {}, # of masked_tokens: {} , "
                         "# of total logkey {}, deepSVDD_label: {} \n".format(

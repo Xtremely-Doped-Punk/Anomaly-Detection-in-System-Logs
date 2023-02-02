@@ -97,7 +97,7 @@ class Predictor():
             print()
             if iter_possib:
                 print("iterating mask_labels...")
-                print('- '*25)
+                print('- '*35)
 
         num_undetected_tokens = 0
         output_maskes = []
@@ -113,7 +113,7 @@ class Predictor():
                     print("token not found in top candidates of masked_output, no.of undetected_tokens++")
         
         if self.debug and iter_possib:
-            print('- '*25)
+            print('- '*35)
             print()
         return num_undetected_tokens, [output_maskes, masked_label.cpu().numpy()]
 
@@ -197,10 +197,11 @@ class Predictor():
             # turn off debuging in dataset, as we just want to see its working for one instance and it is already illustrated above
             print("\n batch_size =",data_loader.batch_size)
             print()
+            print("<<<<<->>>>>"*7)
             
         for idx, data in enumerate(data_loader):
             if self.debug:
-                print("batch no.",idx)
+                print("===> batch no.",idx)
                 print()
             data = {key: value.to(self.device) for key, value in data.items()}
             if self.show_each_inp:
@@ -227,8 +228,8 @@ class Predictor():
             # continue
 
             if self.debug:
-                print("iterating though each session in batch result computed...\n")
-                print('~'*50)
+                print("iterating though each session in batch result computed...")
+                print('~'*75)
             # loop though each session in batch
             for i in range(len(data["bert_label"])):
                 seq_results = {"num_error": 0,
@@ -292,8 +293,12 @@ class Predictor():
                     )
                 total_results.append(seq_results)
 
+            if self.debug:
+                print('~'*75)
+                print()
+        
         if self.debug:
-            print('~'*50)
+            print("<<<<<->>>>>"*7)
             print()
         # for time
         # return total_results, total_errors

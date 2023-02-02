@@ -53,8 +53,8 @@ class Trainer():
         self.show_tensors = options["show_tensors"]
         self.min_no_of_epochs_to_save = options["min_no_of_epochs_to_save"] # save model after 10 warm up epochs
         self.save_override = options["save_on_early_stop"]
-        self.show_each_epoch_inp = options["show_each_epoch_inp"]
-        self.show_each_epoch_out = options["show_each_epoch_out"]
+        self.show_each_inp = options["show_each_inp"]
+        self.show_each_out = options["show_each_out"]
 
         print("Save options parameters")
         save_parameters(options, self.model_dir + "parameters.txt")
@@ -242,7 +242,7 @@ class Trainer():
                     result = self.trainer.model.forward(data["bert_input"], data["time_input"])
                     cls_output = result["cls_output"]
 
-                    if self.show_each_epoch_inp:
+                    if self.show_each_inp:
                         print()
                         #data_shapes = {key:value.shape for key,value in data.items() if value is not None}
                         #print(i,"--> data_dict_shapes:",data_shapes)
@@ -265,7 +265,7 @@ class Trainer():
         if self.debug:
             print("<--> "*20)
             print()
-        if self.show_each_epoch_out:
+        if self.show_each_out:
             print("final_outputs (sum of result['cls_output'] tensor):")
             print(outputs)
             print("\ntotal_samples (no.of times):",total_samples)

@@ -127,11 +127,11 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
     while True:
         logkey_seq_pairs,time_seq_pairs = try_generate_seqences(data_iter, num_session, window_size, adaptive_window, seq_len, min_len, debug)
         
-        if len(logkey_seq_pairs) == 0 or len(time_seq_pairs) == 0:
-            print(f"WARNING: generated sequences with min_len of seq as {min_len} is empty, this might be caused due to small dataset input")
-            min_len = int(min_len/10);
+        if len(logkey_seq_pairs) < 10 or len(time_seq_pairs) < 10: # say we require min 10 sequences (some small threshold)
+            print(f"WARNING: generated sequences with min_len of seq as {min_len} is empty, this might be caused due to smaller dataset input")
+            min_len = int(min_len/2); if min_len<=2: min_len=0
             if debug:
-                print(f"overriding min_len reduced by 10 times => min_len = {min_len}")
+                print(f"overriding min_len reduced by half times => min_len = {min_len}")
         else:
             logkey_seq_pairs = np.array(logkey_seq_pairs)
             time_seq_pairs = np.array(time_seq_pairs)

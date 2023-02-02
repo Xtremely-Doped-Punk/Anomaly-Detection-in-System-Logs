@@ -91,9 +91,13 @@ class Predictor():
             print("masked_output:",masked_output)
             print("masked_label:",masked_label)
             print("no.of candidates given:",self.num_candidates)
+            if len(masked_label)==0:
+                print("as the masked_label is empty, no.of undetected_tokens is none; skiping...")
+                iter_possib = False
             print()
-            print("iterating mask_labels...")
-            print('- '*25)
+            if iter_possib:
+                print("iterating mask_labels...")
+                print('- '*25)
 
         num_undetected_tokens = 0
         output_maskes = []
@@ -101,15 +105,14 @@ class Predictor():
             # output_maskes.append(torch.argsort(-masked_output[i])[:30].cpu().numpy()) # extract top 30 candidates for mask labels
             if self.debug:
                 print("index:",i,"\ttoken:",token)
-                print("argsort of masked output:",torch.argsort(masked_output[i]))
-                print("reverse:",torch.argsort(-masked_output[i]))
+                print("argsort in reverse, i.e. decending order of masked output:",torch.argsort(masked_output[i]))
 
             if token not in torch.argsort(-masked_output[i])[:self.num_candidates]:
                 num_undetected_tokens += 1
                 if self.debug:
                     print("token not found in top candidates of masked_output, no.of undetected_tokens++")
         
-        if self.debug:
+        if self.debug and iter_possib:
             print('- '*25)
             print()
         return num_undetected_tokens, [output_maskes, masked_label.cpu().numpy()]
@@ -274,10 +277,12 @@ class Predictor():
 
 
                 if idx < 10 or idx % 1000 == 0:
+                    if self.debug:
+                        print("FINAL RESULT:", end=" ")
                     print(
                         "{}, #time anomaly: {} # of undetected_tokens: {}, # of masked_tokens: {} , "
                         "# of total logkey {}, deepSVDD_label: {} \n".format(
-                            file_name,
+                            file_name[:-5],
                             seq_results["num_error"],
                             seq_results["undetected_tokens"],
                             seq_results["masked_tokens"],

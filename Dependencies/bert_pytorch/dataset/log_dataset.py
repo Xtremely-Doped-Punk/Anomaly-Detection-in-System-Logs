@@ -73,6 +73,7 @@ class LogDataset(IterableDataset):
             print("new k_label = adding 'pad_index' to start of k_label list =>",k_label)
             print("new t = adding '0' to start of t_masked list =>",t)
             print("new t_label = adding 'pad_index' to start of t_label list =>",t_label)
+            print("<= "*15," =>"*15)
 
         return k, k_label, t, t_label
 
@@ -103,7 +104,7 @@ class LogDataset(IterableDataset):
             time_int = time_intervals[i]
             prob = random.random()
             if self.debug:
-                print(f"\n==> idx:{i}; random prob:{prob}for token:{token}")
+                print(f"\n==> idx:{i}; random prob:{prob} for token:{token}")
 
             # replace 15% of tokens in a sequence to a masked token
             if prob < self.mask_ratio:

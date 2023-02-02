@@ -150,7 +150,7 @@ class Predictor():
         log_seqs = log_seqs[test_sort_index]
         tim_seqs = tim_seqs[test_sort_index]
 
-        print(f"{file_name} size: {len(log_seqs)}")
+        print(f"\n{file_name} size: {len(log_seqs)}")
         return log_seqs, tim_seqs
 
     def helper(self, model, output_dir, file_name, vocab, scale=None, error_dict=None):
@@ -189,7 +189,7 @@ class Predictor():
                                  collate_fn=seq_dataset.collate_fn)
         if self.debug:
             get_item_on_test_sample = data_loader.dataset.get_item(0)
-            print("\n"+file_name+"'s data_loader's batch iteration's get_item() funcationality for sample[idx=0]:",get_item_on_train_sample)
+            print("\n"+file_name+"'s data_loader's batch iteration's get_item() funcationality for sample[idx=0]:",get_item_on_test_sample)
             data_loader.dataset.debug=False
             # turn off debuging in dataset, as we just want to see its working for one instance and it is already illustrated above
             print("\n batch_size =",data_loader.batch_size)
@@ -241,7 +241,6 @@ class Predictor():
                 if self.debug:
                     print("mask_index:",mask_index)
                     print("num_masked:",num_masked)
-                    print("seq_results:",seq_results)
                     print()
 
                 if self.is_logkey:
@@ -324,7 +323,7 @@ class Predictor():
             with open(self.model_dir + "error_dict.pkl", 'rb') as f:
                 error_dict = pickle.load(f)
 
-            if self.show_tensors:
+            if debug:
                 print("loading is_time data available...")
                 print("scale:",scale)
                 print("error_dict:",error_dict)
@@ -336,12 +335,15 @@ class Predictor():
             self.radius = center_dict["radius"]
             # self.center = self.center.view(1,-1)
 
-            if self.show_tensors:
+            if self.debug:
                 print("loading hypersphere_loss data available...")
                 print("center size:",self.center.size())
                 print("radius:",self.radius)
                 print()
 
+            if self.show_tensors:
+                print("center:",self.center)
+                print()
 
         print("test normal predicting")
         test_normal_results, test_normal_errors = self.helper(model, self.output_dir, "test_normal.data", vocab, scale, error_dict)

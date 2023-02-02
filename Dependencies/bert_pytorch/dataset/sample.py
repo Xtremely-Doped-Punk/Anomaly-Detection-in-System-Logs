@@ -129,7 +129,8 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
         
         if len(logkey_seq_pairs) < 10 or len(time_seq_pairs) < 10: # say we require min 10 sequences (some small threshold)
             print(f"WARNING: generated sequences with min_len of seq as {min_len} is empty, this might be caused due to smaller dataset input")
-            min_len = int(min_len/2); if min_len<=2: min_len=0
+            min_len = int(min_len/2)
+            if min_len<=2: min_len=0
             if debug:
                 print(f"overriding min_len reduced by half times => min_len = {min_len}")
         else:

@@ -198,7 +198,7 @@ class Predictor():
             # turn off debuging in dataset, as we just want to see its working for one instance and it is already illustrated above
             print("\n batch_size =",data_loader.batch_size)
             print()
-            print("<<<<<->>>>>"*7)
+            print("<<<<<->>>>> "*7)
             
         for idx, data in enumerate(data_loader):
             if self.debug:
@@ -275,7 +275,7 @@ class Predictor():
                     if self.debug:
                         print("detecting deepSVDD distance using hypersphere_loss...")
                         print("result['cls_output'] size:",result['cls_output'].size())
-                        print("dist:",dist,"/n",dist.item())
+                        print("dist:",dist.item())
 
 
                 if idx < 10 or idx % 1000 == 0:

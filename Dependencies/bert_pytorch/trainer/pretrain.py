@@ -90,7 +90,7 @@ class BERTTrainer:
         self.is_logkey = is_logkey
         self.is_time = is_time
         self.debug = debug
-        
+
         self.init_optimizer()
 
     def init_optimizer(self):
@@ -145,14 +145,14 @@ class BERTTrainer:
         total_dist = []
         for i, data in data_iter:
             if self.debug:
-                print("@~"*30+"...[batch:"+str(i)+"] ..."+"~@"*30)
+                print("@~"*20+"...[batch:"+str(i)+"] ..."+"~@"*20)
 
             data = {key: value.to(self.device) for key, value in data.items()}
 
             result = self.model.forward(data["bert_input"], data["time_input"], debug=self.debug) # debug bertlog
             if self.debug:
                 print("BERTLog final output:")
-                print(x)
+                print(result)
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens

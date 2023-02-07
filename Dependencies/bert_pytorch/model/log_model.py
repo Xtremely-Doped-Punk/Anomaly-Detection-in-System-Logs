@@ -23,7 +23,7 @@ class BERTLog(nn.Module): # main parent model
 
     def forward(self, x, time_info, debug=False):
         if debug:
-            print("#="*30+"...BERTLog forward()..."+"=#"*30)
+            print("#="*20+"...BERTLog forward()..."+"=#"*20)
             print("bert_input:")
             print(x)
             print("time_input:")
@@ -47,7 +47,7 @@ class BERTLog(nn.Module): # main parent model
         if debug:
             print("logkey_output:")
             print(self.result["logkey_output"])
-            print("#"+"=#"*90)
+            print("#"+"=#"*70)
             print()
         return self.result
 

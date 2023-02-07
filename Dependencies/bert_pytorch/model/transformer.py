@@ -27,7 +27,7 @@ class TransformerBlock(nn.Module):
 
     def forward(self, x, mask, debug=False):
         if debug:
-            print("^*"*30+"...Transformer Block forward()..."+"*^"*30)
+            print("^*"*20+"...Transformer Block forward()..."+"*^"*20)
             print("input:",x)
             print("input mask:", mask)
         x = self.input_sublayer(x, lambda _x: self.attention.forward(_x, _x, _x, mask=mask,debug=debug))
@@ -39,6 +39,6 @@ class TransformerBlock(nn.Module):
             print("Output Sublayer Connection final output:")
             print(x)
             print("returning dropout(final_out)")
-            print("^"+"*^"*90)
+            print("^"+"*^"*70)
             print()
         return self.dropout(x)

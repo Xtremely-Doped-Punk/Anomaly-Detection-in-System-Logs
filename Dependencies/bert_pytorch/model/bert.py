@@ -40,7 +40,7 @@ class BERT(nn.Module):
         mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1).unsqueeze(1)
         
         if debug:
-            print("$-"*30+"...BERT forward()..."+"-$"*30)
+            print("$-"*20+"...BERT forward()..."+"-$"*20)
             print("input:",x)
             print("input segment_info:",segment_info)
             print("input time_info:",time_info)
@@ -63,6 +63,6 @@ class BERT(nn.Module):
                 layer_no += 1
 
         if debug:
-            print("$"+"-$"*90)
+            print("$"+"-$"*70)
             print()
         return x

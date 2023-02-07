@@ -25,13 +25,13 @@ class MultiHeadedAttention(nn.Module):
     def forward(self, query, key, value, mask=None, debug=False):
         batch_size = query.size(0)
         if debug:
-            print("|-"*30+"...Multi-Headed Attention forward()..."+"-|"*30)
+            print("|-"*20+"...Multi-Headed Attention forward()..."+"-|"*20)
             print("inp query:",query)
             print("inp key:",key)
             print("inp value:",value)
             print("inp mask:",mask)
             print("batch_size:",batch_size)
-            print("d_model (input total query vector size):", self.d_model, "\th (no.of heads):", self.h, "\td_k (dimension of small head query vector):", self.d_k)
+            print("d_model (input total query vector size):", self.d_k * self.h, "\th (no.of heads):", self.h, "\td_k (dimension of small head query vector):", self.d_k)
 
         # 1) Do all the linear projections in batch from d_model => h x d_k
         # view(params..,-1) will automatically calculate the dimension param given as '-1'
@@ -89,6 +89,6 @@ In this case, however, the difference may be due to some dropout layer, you shou
         if debug:
             print("final linear projection:")
             print(x)
-            print("|"+"-|"*90)
+            print("|"+"-|"*70)
 
         return x

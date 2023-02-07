@@ -9,7 +9,7 @@ class BERT(nn.Module):
     BERT model : Bidirectional Encoder Representations from Transformers.
     """
 
-    def __init__(self, vocab_size, max_len=512, hidden=768, n_layers=12, attn_heads=12, dropout=0.1, is_logkey=True, is_time=False, debug=False):
+    def __init__(self, vocab_size, max_len=512, hidden=768, n_layers=12, attn_heads=12, dropout=0.1, is_logkey=True, is_time=False):
         """
         :param vocab_size: vocab_size of total words
         :param hidden: BERT model hidden size
@@ -33,19 +33,36 @@ class BERT(nn.Module):
         self.transformer_blocks = nn.ModuleList(
             [TransformerBlock(hidden, attn_heads, hidden * 2, dropout) for _ in range(n_layers)])
 
-        self.debug = debug
 
-
-    def forward(self, x, segment_info=None, time_info=None):
+    def forward(self, x, segment_info=None, time_info=None, debug=False):
         # attention masking for padded token
         # torch.ByteTensor([batch_size, 1, seq_len, seq_len)
         mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1).unsqueeze(1)
-
+        
+        if debug:
+            print("$-"*30+"...BERT forward()..."+"-$"*30)
+            print("input:",x)
+            print("input segment_info:",segment_info)
+            print("input time_info:",time_info)
+            print("computed mask:",mask)
+        
         # embedding the indexed sequence to sequence of vectors
-        x = self.embedding(x, segment_info, time_info)
+        x = self.embedding(x, segment_info, time_info, debug=debug)
+
+        if debug:
+            print("BERT Embedding final output:")
+            print(x)
+            layer_no = 1
 
         # running over multiple transformer blocks
         for transformer in self.transformer_blocks:
-            x = transformer.forward(x, mask)
+            x = transformer.forward(x, mask, debug=debug)
+            if debug:
+                print(f"TransformerBlock-{layer_no} final output:")
+                print(x)
+                layer_no += 1
 
+        if debug:
+            prin("$"+"-$"*90)
+            print()
         return x

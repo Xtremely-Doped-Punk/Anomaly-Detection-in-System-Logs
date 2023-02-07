@@ -85,7 +85,7 @@ class BERTTrainer:
                       for key in ["epoch", "lr", "time", "loss"]},
             "valid": {key: []
                       for key in ["epoch", "lr", "time", "loss"]}
-        }
+        } # dict of keys train/valid containing parameter dict that has list of changes made to resp param
 
         print("Total Parameters:", sum([p.nelement() for p in self.model.parameters()]))
 
@@ -94,9 +94,15 @@ class BERTTrainer:
         self.debug = debug
 
     def init_optimizer(self):
-        # Setting the Adam optimizer with hyper-param
+        # Setting the Adam optimizer with hyper-param        
         self.optim = Adam(self.model.parameters(), lr=self.lr, betas=self.betas, weight_decay=self.weight_decay)
         self.optim_schedule = ScheduledOptim(self.optim, self.bert.hidden, n_warmup_steps=self.warmup_steps)
+        if self.debug:
+            print("initializing model training optimizer and schedule...")
+            print("optim:",self.optim)
+            print("optim_schedule:",self.optim_schedule)
+            print("optim.state_dict",self.optim.state_dict())
+            print()
 
     def train(self, epoch):
         return self.iteration(epoch, self.train_data, start_train=True)
@@ -116,7 +122,7 @@ class BERTTrainer:
         :return: None
         """
         str_code = "train" if start_train else "valid"
-
+        
         lr = self.optim.state_dict()['param_groups'][0]['lr']
         start = time.strftime("%H:%M:%S")
         self.log[str_code]['lr'].append(lr)
@@ -126,6 +132,11 @@ class BERTTrainer:
         totol_length = len(data_loader)
         # data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
         data_iter = enumerate(data_loader)
+        
+        if self.debug:
+            print(f"epoch:{epoch} --> {str_code} data")
+            print(f"learning_rate:{lr}, time:{time}")
+            print(f"total len of data:{totol_length}, iterating through it batch-wise..")
 
         total_loss = 0.0
         total_logkey_loss = 0.0
@@ -133,9 +144,15 @@ class BERTTrainer:
 
         total_dist = []
         for i, data in data_iter:
+            if self.debug:
+                print("@~"*30+"...[batch:"+str(i)+"] ..."+"~@"*30)
+
             data = {key: value.to(self.device) for key, value in data.items()}
 
-            result = self.model.forward(data["bert_input"], data["time_input"])
+            result = self.model.forward(data["bert_input"], data["time_input"], debug=self.debug) # debug bertlog
+            if self.debug:
+                print("BERTLog final output:")
+                print(x)
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens

@@ -121,7 +121,7 @@ class Trainer():
 
         print("Building BERT model")
         bert = BERT(len(vocab), max_len=self.max_len, hidden=self.hidden, n_layers=self.layers, attn_heads=self.attn_heads,
-                    is_logkey=self.is_logkey, is_time=self.is_time, debug=self.debug)
+                    is_logkey=self.is_logkey, is_time=self.is_time)
         if self.debug:
             print("bert instance:",bert)
             print()
@@ -153,6 +153,8 @@ class Trainer():
         for epoch in range(self.epochs):
             if self.debug:
                 print("\n<<<","="*25,"epoch:",epoch+1,"="*25,">>>")
+                if epoch == 0:
+                    print("debugging logbert trainer for only one epoch...")
             print("\n")
             if self.hypersphere_loss:
                 if self.debug:
@@ -174,6 +176,8 @@ class Trainer():
                 self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
                 if self.debug:
                     print("new trainer.radius:",self.trainer.radius)
+                    if epoch == 0:
+                        self.trainer.debug = False # turn of trainner debug after 1st epoch
 
             if avg_valid_loss < best_loss:
                 best_loss = avg_valid_loss
@@ -181,7 +185,7 @@ class Trainer():
                 epochs_no_improve = 0
 
                 if epoch > self.min_no_of_epochs_to_save and self.hypersphere_loss:
-                    self.save_model(total_dist = train_dist + valid_dist)
+                    self.save_hypersphere(total_dist = train_dist + valid_dist)
             else:
                 epochs_no_improve += 1
 
@@ -190,14 +194,14 @@ class Trainer():
                     print()
                 print("Early stopping")
                 if self.save_override:
-                    print("Saving Model even on Early stopping, save_model override...")
+                    print("Saving Model even on Early stopping, save_hypersphere override...\n")
                     print("=-="*20)
                     self.trainer.save(self.model_path)
-                    self.save_model(total_dist = train_dist + valid_dist)
+                    self.save_hypersphere(total_dist = train_dist + valid_dist)
                     print("=-="*20)
                 break
 
-    def save_model(self, total_dist):
+    def save_hypersphere(self, total_dist):
         best_center = self.trainer.hyper_center
         best_radius = self.trainer.radius
         if best_center is None:

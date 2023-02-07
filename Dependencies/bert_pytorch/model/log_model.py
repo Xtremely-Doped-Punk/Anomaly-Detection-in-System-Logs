@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 from .bert import BERT
 
-class BERTLog(nn.Module):
+class BERTLog(nn.Module): # main parent model
     """
     BERT Log Model
     """
@@ -21,8 +21,20 @@ class BERTLog(nn.Module):
         #self.cls_lm = LogClassifier(self.bert.hidden)
         self.result = {"logkey_output": None, "time_output": None, "cls_output": None, "cls_fnn_output": None}
 
-    def forward(self, x, time_info):
-        x = self.bert(x, time_info=time_info)
+    def forward(self, x, time_info, debug=False):
+        if debug:
+            print("#="*30+"...BERTLog forward()..."+"=#"*30)
+            print("bert_input:")
+            print(x)
+            print("time_input:")
+            print(time_info)
+
+        x = self.bert(x, time_info=time_info, debug=self.debug)
+
+        if debug:
+            print("BERT final output:")
+            print(x)
+            print("Masked Log Model:",self.mask_lm)
 
         self.result["logkey_output"] = self.mask_lm(x)
         # self.result["time_output"] = self.time_lm(x)
@@ -32,7 +44,11 @@ class BERTLog(nn.Module):
         # self.result["cls_output"] = self.fnn_cls(x[:, 0])
 
         # print(self.result["cls_fnn_output"].shape)
-
+        if debug:
+            print("logkey_output:")
+            print(self.result["logkey_output"])
+            prin("#"+"=#"*90)
+            print()
         return self.result
 
 class MaskedLogModel(nn.Module):
@@ -51,6 +67,7 @@ class MaskedLogModel(nn.Module):
         self.softmax = nn.LogSoftmax(dim=-1)
 
     def forward(self, x):
+        print("MaskedLogModel forward() returns softmax probabilities of liner projection of prev hidden layer to vocab_size")
         return self.softmax(self.linear(x))
 
 
@@ -60,6 +77,7 @@ class TimeLogModel(nn.Module):
         self.linear = nn.Linear(hidden, time_size)
 
     def forward(self, x):
+        print("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size")
         return self.linear(x)
 
 class LogClassifier(nn.Module):

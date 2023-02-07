@@ -31,12 +31,40 @@ class BERTEmbedding(nn.Module):
         self.is_logkey = is_logkey
         self.is_time = is_time
 
-    def forward(self, sequence, segment_label=None, time_info=None):
+    def forward(self, sequence, segment_label=None, time_info=None, debug=False):
+        if debug:
+            print("%-"*30+"...BERTEmbedding forward()..."+"-%"*30)
+            print("input sequence:",sequence)
+            print("segment_label:",segment_label)
+            print("time_info:",time_info)
+
         x = self.position(sequence)
+        if debug:
+            print("Positional Embedding final output:")
+            print(x)
+        y = self.token(sequence)
+        if debug:
+            print("Token Embedding final output:")
+            print(y)
+
         # if self.is_logkey:
-        x = x + self.token(sequence)
+        x = x + y
+
         if segment_label is not None:
-            x = x + self.segment(segment_label)
+            y = self.segment(segment_label)
+            x = x + y
+            if debug:
+                print("Segment Embedding final output:")
+                print(y)
         if self.is_time:
-            x = x + self.time_embed(time_info)
+            y = self.time_embed(time_info)
+            x = x + y
+            if debug:
+                print("Time Embedding final output:")
+                print(y)
+
+        if debug:
+            print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None)")
+            prin("%"+"-%"*90)
+            print()
         return self.dropout(x)

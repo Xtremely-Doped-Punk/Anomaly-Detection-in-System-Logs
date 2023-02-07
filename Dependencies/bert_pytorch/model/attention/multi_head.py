@@ -55,7 +55,16 @@ class MultiHeadedAttention(nn.Module):
         # 2) Apply attention on all the projected vectors in batch.
         if debug:
             print(">>> 2] Apply attention on all the projected vectors in batch.")
-        x, attn = self.attention(query, key, value, mask=mask, dropout=self.dropout)
+        
+        '''
+link: https://stackoverflow.com/questions/55338756/why-there-are-different-output-between-model-forwardinput-and-modelinput
+model.forward just calls the forward operations as you mention but __call__ does a little extra.
+If you dig into the code of nn.Module class you will see __call__ ultimately calls forward but internally handles the forward or backward hooks and manages some states that pytorch allows. When calling a simple model like just an MLP, it may not be really needed but more complex model like spectral normalization layers have hooks and therefore you should use model(.) signature as much as possible unless you explicitly just want to call model.forward
+Also see Calling forward function without .forward()
+In this case, however, the difference may be due to some dropout layer, you should call vgg.eval() to make sure all the stochasticity in network is turned off before comparing the outputs.
+        '''
+        x, attn = self.attention(query, key, value, mask=mask, dropout=self.dropout, debug=debug)
+        
         if debug:
             print("Attention final output:")
             print("Attention Weight Matrix:",x)

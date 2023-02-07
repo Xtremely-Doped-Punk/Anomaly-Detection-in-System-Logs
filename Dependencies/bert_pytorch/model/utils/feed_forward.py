@@ -3,7 +3,7 @@ from .gelu import GELU
 
 
 class PositionwiseFeedForward(nn.Module):
-    "Implements FFN equation."
+    "Implements FFN equation (Feed Forward Neural Network)."
 
     def __init__(self, d_model, d_ff, dropout=0.1):
         super(PositionwiseFeedForward, self).__init__()

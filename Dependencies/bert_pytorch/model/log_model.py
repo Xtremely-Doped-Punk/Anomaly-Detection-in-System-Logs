@@ -47,7 +47,7 @@ class BERTLog(nn.Module): # main parent model
         if debug:
             print("logkey_output:")
             print(self.result["logkey_output"])
-            prin("#"+"=#"*90)
+            print("#"+"=#"*90)
             print()
         return self.result
 

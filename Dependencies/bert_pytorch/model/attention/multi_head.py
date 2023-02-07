@@ -80,6 +80,6 @@ class MultiHeadedAttention(nn.Module):
         if debug:
             print("final linear projection:")
             print(x)
-            prin("|"+"-|"*90)
+            print("|"+"-|"*90)
 
         return x

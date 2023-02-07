@@ -11,6 +11,8 @@ class Attention(nn.Module):
     """
 
     def forward(self, query, key, value, mask=None, dropout=None):
+        if debug:
+            print("(-"*30+"...Scaled Dot Product Attention forward()..."+"-)"*30)
         scores = torch.matmul(query, key.transpose(-2, -1)) \
                  / math.sqrt(query.size(-1))
 
@@ -21,5 +23,10 @@ class Attention(nn.Module):
 
         if dropout is not None:
             p_attn = dropout(p_attn)
+
+        if debug:
+            print("final linear projection:")
+            print(x)
+            print(("(-"*45)+("-)"*45))
 
         return torch.matmul(p_attn, value), p_attn

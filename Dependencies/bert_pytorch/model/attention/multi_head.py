@@ -75,7 +75,11 @@ class MultiHeadedAttention(nn.Module):
         if debug:
             print("Concatinated final output:")
             print(x)
-            print("returning final linear projections(final_out)")
+
+        x = self.output_linear(x)
+        if debug:
+            print("final linear projection:")
+            print(x)
             prin("|"+"-|"*90)
 
-        return self.output_linear(x)
+        return x

@@ -64,5 +64,5 @@ class BERT(nn.Module):
 
         if debug_file is not None:
             print("$"+"-$"*70, file=debug_file)
-            print(, file=debug_file)
+            print("", file=debug_file)
         return x

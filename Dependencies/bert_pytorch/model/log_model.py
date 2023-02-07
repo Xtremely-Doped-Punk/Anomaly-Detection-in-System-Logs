@@ -48,7 +48,7 @@ class BERTLog(nn.Module): # main parent model
             print("logkey_output:", file=debug_file)
             print(self.result["logkey_output"], file=debug_file)
             print("#"+"=#"*70, file=debug_file)
-            print(, file=debug_file)
+            print("", file=debug_file)
         return self.result
 
 class MaskedLogModel(nn.Module):
@@ -98,7 +98,7 @@ class TimeLogModel(nn.Module):
         if debug_file is not None:
             print("linear projection:", file=debug_file)
             print(x, file=debug_file)
-            print(, file=debug_file)
+            print("", file=debug_file)
         return x
 
 class LogClassifier(nn.Module):

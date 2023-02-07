@@ -102,7 +102,7 @@ class BERTTrainer:
             print("optim:",self.optim, file=self.debug_file)
             print("optim_schedule:",self.optim_schedule, file=self.debug_file)
             print("optim.state_dict",self.optim.state_dict(), file=self.debug_file)
-            print(, file=self.debug_file)
+            print("", file=self.debug_file)
 
     def train(self, epoch):
         return self.iteration(epoch, self.train_data, start_train=True)

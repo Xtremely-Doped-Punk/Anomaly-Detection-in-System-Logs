@@ -63,6 +63,6 @@ class BERT(nn.Module):
                 layer_no += 1
 
         if debug:
-            print("$"+"-$"*90)
+            prin("$"+"-$"*90)
             print()
         return x

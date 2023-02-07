@@ -62,8 +62,6 @@ class BERTTrainer:
         self.warmup_steps = warmup_steps
         self.optim = None
         self.optim_schedule = None
-        self.init_optimizer()
-
 
         # Using Negative Log Likelihood Loss function for predicting the masked_token
         self.criterion = nn.NLLLoss(ignore_index=0)
@@ -92,6 +90,8 @@ class BERTTrainer:
         self.is_logkey = is_logkey
         self.is_time = is_time
         self.debug = debug
+        
+        self.init_optimizer()
 
     def init_optimizer(self):
         # Setting the Adam optimizer with hyper-param        

@@ -29,15 +29,15 @@ class BERTLog(nn.Module): # main parent model
             print("time_input:")
             print(time_info)
 
-        x = self.bert(x, time_info=time_info, debug=self.debug)
+        x = self.bert(x, time_info=time_info, debug=debug)
 
         if debug:
             print("BERT final output:")
             print(x)
             print("Masked Log Model:",self.mask_lm)
 
-        self.result["logkey_output"] = self.mask_lm(x)
-        # self.result["time_output"] = self.time_lm(x)
+        self.result["logkey_output"] = self.mask_lm(x,debug=debug)
+        # self.result["time_output"] = self.time_lm(x,debug=debug)
 
         # self.result["cls_output"] = x.float().mean(axis=1) #x[:, 0]
         self.result["cls_output"] = x[:, 0]
@@ -66,9 +66,23 @@ class MaskedLogModel(nn.Module):
         self.linear = nn.Linear(hidden, vocab_size)
         self.softmax = nn.LogSoftmax(dim=-1)
 
-    def forward(self, x):
-        print("MaskedLogModel forward() returns softmax probabilities of liner projection of prev hidden layer to vocab_size")
-        return self.softmax(self.linear(x))
+    def forward(self, x, debug=False):
+        if debug:
+            print("MaskedLogModel forward() returns softmax probabilities of linear projection of prev hidden layer to vocab_size")
+            print("input weight:")
+            print(x)
+
+        x = self.linear(x)
+        if debug:
+            print("linear projection:")
+            print(x)
+
+        x = self.softmax(x)
+        if debug:
+            print("softmax probabilities:")
+            print(x)
+            print()
+        return x
 
 
 class TimeLogModel(nn.Module):
@@ -76,9 +90,15 @@ class TimeLogModel(nn.Module):
         super().__init__()
         self.linear = nn.Linear(hidden, time_size)
 
-    def forward(self, x):
-        print("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size")
-        return self.linear(x)
+    def forward(self, x, debug=False):
+        if debug:
+            print("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size")
+        x = self.linear(x)
+        if debug:
+            print("linear projection:")
+            print(x)
+            print()
+        return x
 
 class LogClassifier(nn.Module):
     def __init__(self, hidden):

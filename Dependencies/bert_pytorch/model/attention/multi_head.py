@@ -89,6 +89,6 @@ In this case, however, the difference may be due to some dropout layer, you shou
         if debug_file is not None:
             print("final linear projection:", file=debug_file)
             print(x, file=debug_file)
-            print("|"+"-|"*70, file=debug_file)
+            print("|"+"-|"*60, file=debug_file)
 
         return x

@@ -63,6 +63,6 @@ class BERT(nn.Module):
                 layer_no += 1
 
         if debug_file is not None:
-            print("$"+"-$"*70, file=debug_file)
+            print("$"+"-$"*60, file=debug_file)
             print("", file=debug_file)
         return x

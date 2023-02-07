@@ -41,7 +41,7 @@ class TransformerBlock(nn.Module):
             print("Output Sublayer Connection final output:", file=debug_file)
             print(x, file=debug_file)
             print("returning dropout(final_out)", file=debug_file)
-            print("^"+"*^"*70, file=debug_file)
+            print("^"+"*^"*60, file=debug_file)
             print("", file=debug_file)
 
         return self.dropout(x)

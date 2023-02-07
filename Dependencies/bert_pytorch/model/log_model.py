@@ -47,7 +47,7 @@ class BERTLog(nn.Module): # main parent model
         if debug_file is not None:
             print("logkey_output:", file=debug_file)
             print(self.result["logkey_output"], file=debug_file)
-            print("#"+"=#"*70, file=debug_file)
+            print("#"+"=#"*60, file=debug_file)
             print("", file=debug_file)
         return self.result
 

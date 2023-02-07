@@ -46,6 +46,6 @@ class Attention(nn.Module):
         if debug_file is not None:
             print("final SDPA(Q,K,V) = softmax scores * values =>:", file=debug_file)
             print(x, file=debug_file)
-            print(("(-"*38)+("-)"*38), file=debug_file)
+            print(("(-"*30)+("-)"*30), file=debug_file)
 
         return x, p_attn

@@ -156,7 +156,7 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                epoch_print = "\n<<< "+("="*25)+"epoch:"+str(epoch+1)+("="*25)+" >>>"
+                epoch_print = "\n<<< "+("="*30)+"epoch:"+str(epoch+1)+("="*30)+" >>>"
                 print(epoch_print)
                 print(epoch_print, file=self.debug_file)
                 if epoch == 0:

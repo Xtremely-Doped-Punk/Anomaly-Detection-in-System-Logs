@@ -12,6 +12,7 @@ import pandas as pd
 import torch
 import tqdm
 import gc # garbage collector
+from datetime import datetime
 
 class Trainer():
     def __init__(self, options):
@@ -55,6 +56,9 @@ class Trainer():
         self.save_override = options["save_on_early_stop"]
         self.show_each_inp = options["show_each_inp"]
         self.show_each_out = options["show_each_out"]
+        if self.debug:
+            self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+"].out",'w')
+
 
         print("Save options parameters")
         save_parameters(options, self.model_dir + "parameters.txt")
@@ -131,7 +135,7 @@ class Trainer():
                               lr=self.lr, betas=(self.adam_beta1, self.adam_beta2), weight_decay=self.adam_weight_decay,
                               with_cuda=self.with_cuda, cuda_devices=self.cuda_devices, log_freq=self.log_freq,
                               is_logkey=self.is_logkey, is_time=self.is_time,
-                              hypersphere_loss=self.hypersphere_loss, debug=self.debug)
+                              hypersphere_loss=self.hypersphere_loss, debug_file=self.debug_file)
         
         if self.debug:
             print("bert-trainner instance:",self.trainer)
@@ -152,7 +156,9 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                print("\n<<<","="*25,"epoch:",epoch+1,"="*25,">>>")
+                epoch_print = "\n<<<","="*25,"epoch:",epoch+1,"="*25,">>>"
+                print(epoch_print)
+                print(epoch_print, file=self.debug_file)
                 if epoch == 0:
                     print("debugging logbert trainer for only one epoch...")
             print("\n")
@@ -163,8 +169,10 @@ class Trainer():
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
 
+            # model trainin will be debug logged into seperate file
             avg_train_loss, train_dist = self.trainer.train(epoch)
             avg_valid_loss, valid_dist = self.trainer.valid(epoch)
+
             self.trainer.save_log(self.model_dir, surfix_log)
 
             if self.debug:
@@ -177,7 +185,7 @@ class Trainer():
                 if self.debug:
                     print("new trainer.radius:",self.trainer.radius)
                     if epoch == 0:
-                        self.trainer.debug = False # turn of trainner debug after 1st epoch
+                        self.trainer.debug_file = None # turn of trainner debug after 1st epoch
 
             if avg_valid_loss < best_loss:
                 best_loss = avg_valid_loss

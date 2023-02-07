@@ -31,21 +31,22 @@ class BERTEmbedding(nn.Module):
         self.is_logkey = is_logkey
         self.is_time = is_time
 
-    def forward(self, sequence, segment_label=None, time_info=None, debug=False):
-        if debug:
-            print("%-"*20+"...BERTEmbedding forward()..."+"-%"*20)
-            print("input sequence:",sequence)
-            print("segment_label:",segment_label)
-            print("time_info:",time_info)
+    def forward(self, sequence, segment_label=None, time_info=None, debug_file=None):
+        if debug_file is not None:
+            print("%-"*20+"...BERTEmbedding forward()..."+"-%"*20, file=debug_file)
+            print("input sequence:",sequence, file=debug_file)
+            print("segment_label:",segment_label, file=debug_file)
+            print("time_info:",time_info, file=debug_file)
 
         x = self.position(sequence)
-        if debug:
-            print("Positional Embedding final output:")
-            print(x)
+        if debug_file is not None:
+            print("Positional Embedding final output:", file=debug_file)
+            print(x, file=debug_file)
+
         y = self.token(sequence)
-        if debug:
-            print("Token Embedding final output:")
-            print(y)
+        if debug_file is not None:
+            print("Token Embedding final output:", file=debug_file)
+            print(y, file=debug_file)
 
         # if self.is_logkey:
         x = x + y
@@ -53,18 +54,19 @@ class BERTEmbedding(nn.Module):
         if segment_label is not None:
             y = self.segment(segment_label)
             x = x + y
-            if debug:
-                print("Segment Embedding final output:")
-                print(y)
+            if debug_file is not None:
+                print("Segment Embedding final output:", file=debug_file)
+                print(y, file=debug_file)
         if self.is_time:
             y = self.time_embed(time_info)
             x = x + y
-            if debug:
-                print("Time Embedding final output:")
-                print(y)
+            if debug_file is not None:
+                print("Time Embedding final output:", file=debug_file)
+                print(y, file=debug_file)
 
-        if debug:
-            print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None)")
-            print("%"+"-%"*70)
-            print()
+        if debug_file is not None:
+            print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None)", file=debug_file)
+            print("%"+"-%"*70, file=debug_file)
+            print("returning dropout(final_out)", file=debug_file)
+            print(, file=debug_file)
         return self.dropout(x)

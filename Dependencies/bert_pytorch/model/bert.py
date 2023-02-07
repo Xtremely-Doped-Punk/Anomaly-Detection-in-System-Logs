@@ -34,35 +34,35 @@ class BERT(nn.Module):
             [TransformerBlock(hidden, attn_heads, hidden * 2, dropout) for _ in range(n_layers)])
 
 
-    def forward(self, x, segment_info=None, time_info=None, debug=False):
+    def forward(self, x, segment_info=None, time_info=None, debug_file=None):
         # attention masking for padded token
         # torch.ByteTensor([batch_size, 1, seq_len, seq_len)
         mask = (x > 0).unsqueeze(1).repeat(1, x.size(1), 1).unsqueeze(1)
         
-        if debug:
-            print("$-"*20+"...BERT forward()..."+"-$"*20)
-            print("input:",x)
-            print("input segment_info:",segment_info)
-            print("input time_info:",time_info)
-            print("computed mask:",mask)
+        if debug_file is not None:
+            print("$-"*20+"...BERT forward()..."+"-$"*20, file=debug_file)
+            print("input:",x, file=debug_file)
+            print("input segment_info:",segment_info, file=debug_file)
+            print("input time_info:",time_info, file=debug_file)
+            print("computed mask:",mask, file=debug_file)
         
         # embedding the indexed sequence to sequence of vectors
-        x = self.embedding(x, segment_info, time_info, debug=debug)
+        x = self.embedding(x, segment_info, time_info, debug_file=debug_file)
 
-        if debug:
-            print("BERT Embedding final output:")
-            print(x)
+        if debug_file is not None:
+            print("BERT Embedding final output:", file=debug_file)
+            print(x, file=debug_file, file=debug_file)
             layer_no = 1
 
         # running over multiple transformer blocks
         for transformer in self.transformer_blocks:
-            x = transformer.forward(x, mask, debug=debug)
-            if debug:
-                print(f"TransformerBlock-{layer_no} final output:")
-                print(x)
+            x = transformer.forward(x, mask, debug_file=debug_file)
+            if debug_file is not None:
+                print(f"TransformerBlock-{layer_no} final output:", file=debug_file)
+                print(x, file=debug_file)
                 layer_no += 1
 
-        if debug:
-            print("$"+"-$"*70)
-            print()
+        if debug_file is not None:
+            print("$"+"-$"*70, file=debug_file)
+            print(, file=debug_file)
         return x

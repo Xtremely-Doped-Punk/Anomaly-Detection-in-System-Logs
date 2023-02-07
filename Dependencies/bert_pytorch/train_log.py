@@ -57,7 +57,7 @@ class Trainer():
         self.show_each_inp = options["show_each_inp"]
         self.show_each_out = options["show_each_out"]
         if self.debug:
-            self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H:%M:%S')+"].out",'w')
+            self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H_%M_%S')+"].out",'w')
 
 
         print("Save options parameters")
@@ -156,7 +156,7 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                epoch_print = "\n<<<","="*25,"epoch:",epoch+1,"="*25,">>>"
+                epoch_print = "\n<<< "+("="*25)+"epoch:"+str(epoch+1)+("="*25)+" >>>"
                 print(epoch_print)
                 print(epoch_print, file=self.debug_file)
                 if epoch == 0:

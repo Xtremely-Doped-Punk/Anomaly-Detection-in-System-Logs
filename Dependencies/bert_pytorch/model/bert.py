@@ -51,7 +51,7 @@ class BERT(nn.Module):
 
         if debug_file is not None:
             print("BERT Embedding final output:", file=debug_file)
-            print(x, file=debug_file, file=debug_file)
+            print(x, file=debug_file)
             layer_no = 1
 
         # running over multiple transformer blocks

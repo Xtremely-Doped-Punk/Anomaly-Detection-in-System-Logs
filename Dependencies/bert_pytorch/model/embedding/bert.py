@@ -68,5 +68,5 @@ class BERTEmbedding(nn.Module):
             print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None)", file=debug_file)
             print("%"+"-%"*70, file=debug_file)
             print("returning dropout(final_out)", file=debug_file)
-            print(, file=debug_file)
+            print("", file=debug_file)
         return self.dropout(x)

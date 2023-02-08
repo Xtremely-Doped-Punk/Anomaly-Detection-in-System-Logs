@@ -23,18 +23,18 @@ class BERTLog(nn.Module): # main parent model
 
     def forward(self, x, time_info, debug_file=None):
         if debug_file is not None:
-            print("#="*20+"...BERTLog forward()..."+"=#"*20, file=debug_file)
-            print("bert_input:", file=debug_file)
-            print(x, file=debug_file)
-            print("time_input:", file=debug_file)
-            print(time_info, file=debug_file)
+            debug_file.write("#="*20+"...BERTLog forward()..."+"=#"*20 +"\n")
+            debug_file.write("bert_input:" +"\n")
+            debug_file.write(str(x) +"\n")
+            debug_file.write("time_input:" +"\n")
+            debug_file.write(str(time_info) +"\n")
 
         x = self.bert(x, time_info=time_info, debug_file=debug_file)
 
         if debug_file is not None:
-            print("BERT final output:", file=debug_file)
-            print(x, file=debug_file)
-            print("Masked Log Model:",self.mask_lm, file=debug_file)
+            debug_file.write("BERT final output:" +"\n")
+            debug_file.write(str(x) +"\n")
+            debug_file.write("Masked Log Model:"+str(self.mask_lm) +"\n")
 
         self.result["logkey_output"] = self.mask_lm(x,debug_file=debug_file)
         # self.result["time_output"] = self.time_lm(x,debug_file=debug_file)
@@ -45,10 +45,10 @@ class BERTLog(nn.Module): # main parent model
 
         # print(self.result["cls_fnn_output"].shape)
         if debug_file is not None:
-            print("logkey_output:", file=debug_file)
-            print(self.result["logkey_output"], file=debug_file)
-            print("#"+"=#"*60, file=debug_file)
-            print("", file=debug_file)
+            debug_file.write("logkey_output:" +"\n")
+            debug_file.write(str(self.result["logkey_output"]) +"\n")
+            debug_file.write("#"+"=#"*60 +"\n")
+            debug_file.write("\n")
         return self.result
 
 class MaskedLogModel(nn.Module):
@@ -68,20 +68,20 @@ class MaskedLogModel(nn.Module):
 
     def forward(self, x, debug_file=None):
         if debug_file is not None:
-            print("MaskedLogModel forward() returns softmax probabilities of linear projection of prev hidden layer to vocab_size", file=debug_file)
-            print("input weight:", file=debug_file)
-            print(x, file=debug_file)
+            debug_file.write("MaskedLogModel forward() returns softmax probabilities of linear projection of prev hidden layer to vocab_size" +"\n")
+            debug_file.write("input weight:" +"\n")
+            debug_file.write(str(x) +"\n")
 
         x = self.linear(x)
         if debug_file is not None:
-            print("linear projection:", file=debug_file)
-            print(x, file=debug_file)
+            debug_file.write("linear projection:" +"\n")
+            debug_file.write(str(x) +"\n")
 
         x = self.softmax(x)
         if debug_file is not None:
-            print("softmax probabilities:", file=debug_file)
-            print(x, file=debug_file)
-            print()
+            debug_file.write("softmax probabilities:" +"\n")
+            debug_file.write(str(x) +"\n")
+            debug_file.write("\n")
         return x
 
 
@@ -92,13 +92,13 @@ class TimeLogModel(nn.Module):
 
     def forward(self, x, debug_file=None):
         if debug_file is not None:
-            print("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size", file=debug_file)
+            debug_file.write("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size" +"\n")
         
         x = self.linear(x)
         if debug_file is not None:
-            print("linear projection:", file=debug_file)
-            print(x, file=debug_file)
-            print("", file=debug_file)
+            debug_file.write("linear projection:" +"\n")
+            debug_file.write(str(x) +"\n")
+            debug_file.write("\n")
         return x
 
 class LogClassifier(nn.Module):

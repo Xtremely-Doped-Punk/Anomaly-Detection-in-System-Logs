@@ -100,7 +100,7 @@ class BERTTrainer:
         if self.debug_file is not None:
             self.debug_file.write("initializing model training optimizer and schedule..."+"\n")
             self.debug_file.write("optim: "+str(self.optim)+"\n")
-            self.debug_file.write("optim_schedule: ",str(self.optim_schedule)+"\n")
+            self.debug_file.write("optim_schedule: "+str(self.optim_schedule)+"\n")
             self.debug_file.write("optim.state_dict "+str(self.optim.state_dict())+"\n")
             self.debug_file.write("\n")
 
@@ -149,10 +149,10 @@ class BERTTrainer:
 
             data = {key: value.to(self.device) for key, value in data.items()}
 
-            result = self.model.forward(data["bert_input"], data["time_input"], debug_+"\n") # debug bertlog
+            result = self.model.forward(data["bert_input"], data["time_input"], self.debug_file) # debug bertlog
             if self.debug_file is not None:
                 self.debug_file.write("BERTLog final output:" +"\n")
-                self.debug_file.write(result +"\n")
+                self.debug_file.write(str(result) +"\n")
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens

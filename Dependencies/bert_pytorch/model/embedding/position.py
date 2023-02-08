@@ -24,16 +24,16 @@ class PositionalEmbedding(nn.Module):
 
         if debug_file is not None:
             print("initializing an zero empty array tensor ('pe') of shape:",pe.size(), file=debug_file)
-            print("gradients for this positional embeddings ('pe') need not be computed during the backward pass \
-                as we want it initialized only once, i.e. pe.require_grad:",pe.require_grad, file=debug_file)
+            print("gradients for this positional embeddings ('pe') need not be computed during the backward pass", file=debug_file)
+            print("as we want it initialized only once, i.e. pe.require_grad:",pe.require_grad, file=debug_file)
 
         position = torch.arange(0, max_len).float().unsqueeze(1) # unsqueeze(1) => add singular in 1st idx dim
         div_term = (torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)).exp()
         
         if debug_file is not None:
-            print(f"position: (size:{position.size})", file=debug_file)
-            print(position, file=debug_file)
-            print(f"div_term: (size:{div_term.size})", file=debug_file)
+            print(f"position: arrange vector till {max_len} (size:{position.size()})", file=debug_file)
+            #print(position, file=debug_file)
+            print(f"div_term: (size:{div_term.size()})", file=debug_file)
             print(div_term, file=debug_file)
             print(f"sine on shape: {pe[:, 0::2].size()}", file=debug_file)
             print(f"cosine on shape: {pe[:, 1::2].size()}", file=debug_file)

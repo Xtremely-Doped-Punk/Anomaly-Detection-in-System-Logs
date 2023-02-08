@@ -98,11 +98,11 @@ class BERTTrainer:
         self.optim = Adam(self.model.parameters(), lr=self.lr, betas=self.betas, weight_decay=self.weight_decay)
         self.optim_schedule = ScheduledOptim(self.optim, self.bert.hidden, n_warmup_steps=self.warmup_steps)
         if self.debug_file is not None:
-            print("initializing model training optimizer and schedule...", file=self.debug_file)
-            print("optim:",self.optim, file=self.debug_file)
-            print("optim_schedule:",self.optim_schedule, file=self.debug_file)
-            print("optim.state_dict",self.optim.state_dict(), file=self.debug_file)
-            print("", file=self.debug_file)
+            self.debug_file.write("initializing model training optimizer and schedule..."+"\n")
+            self.debug_file.write("optim: "+str(self.optim)+"\n")
+            self.debug_file.write("optim_schedule: ",str(self.optim_schedule)+"\n")
+            self.debug_file.write("optim.state_dict "+str(self.optim.state_dict())+"\n")
+            self.debug_file.write("\n")
 
     def train(self, epoch):
         return self.iteration(epoch, self.train_data, start_train=True)
@@ -134,9 +134,9 @@ class BERTTrainer:
         data_iter = enumerate(data_loader)
         
         if self.debug_file is not None:
-            print(f"epoch:{epoch} --> {str_code} data", file=self.debug_file)
-            print(f"learning_rate:{lr}, time:{time}", file=self.debug_file)
-            print(f"total len of data:{totol_length}, iterating through it batch-wise..", file=self.debug_file)
+            self.debug_file.write(f"epoch:{epoch} --> {str_code} data" +"\n")
+            self.debug_file.write(f"learning_rate:{lr}, time:{time}" +"\n")
+            self.debug_file.write(f"total len of data:{totol_length}, iterating through it batch-wise.." +"\n")
 
         total_loss = 0.0
         total_logkey_loss = 0.0
@@ -145,14 +145,14 @@ class BERTTrainer:
         total_dist = []
         for i, data in data_iter:
             if self.debug_file is not None:
-                print("@~"*20+"...[batch:"+str(i)+"] ..."+"~@"*20, file=self.debug_file)
+                self.debug_file.write("@~"*20+"...[batch:"+str(i)+"] ..."+"~@"*20 +"\n")
 
             data = {key: value.to(self.device) for key, value in data.items()}
 
-            result = self.model.forward(data["bert_input"], data["time_input"], debug_file=self.debug_file) # debug bertlog
+            result = self.model.forward(data["bert_input"], data["time_input"], debug_+"\n") # debug bertlog
             if self.debug_file is not None:
-                print("BERTLog final output:", file=self.debug_file)
-                print(result, file=self.debug_file)
+                self.debug_file.write("BERTLog final output:" +"\n")
+                self.debug_file.write(result +"\n")
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens

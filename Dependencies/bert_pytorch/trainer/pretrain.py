@@ -151,7 +151,8 @@ class BERTTrainer:
 
             result = self.model.forward(data["bert_input"], data["time_input"], self.debug_file) # debug bertlog
             if self.debug_file is not None:
-                self.debug_file.write("BERTLog final output: (size:"+str(result.size())+")" +"\n")
+                result_sizes = {key:value.size() for key, value in result.items() if value is not None}
+                self.debug_file.write("BERTLog final output: (size:"+str(result_sizes)+")" +"\n")
                 self.debug_file.write(str(result) +"\n")
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 

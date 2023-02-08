@@ -38,7 +38,7 @@ class BERTEmbedding(nn.Module):
             print("segment_label:",segment_label, file=debug_file)
             print("time_info:",time_info, file=debug_file)
 
-        x = self.position(sequence)
+        x = self.position(sequence,debug_file)
         if debug_file is not None:
             print("Positional Embedding final output: (size:"+str(x.size())+")", file=debug_file)
             print(x, file=debug_file)
@@ -58,7 +58,7 @@ class BERTEmbedding(nn.Module):
                 print("Segment Embedding final output: (size:"+str(y.size())+")", file=debug_file)
                 print(y, file=debug_file)
         if self.is_time:
-            y = self.time_embed(time_info)
+            y = self.time_embed(time_info,debug_file)
             x = x + y
             if debug_file is not None:
                 print("Time Embedding final output: (size:"+str(y.size())+")", file=debug_file)

@@ -40,12 +40,12 @@ class BERTEmbedding(nn.Module):
 
         x = self.position(sequence)
         if debug_file is not None:
-            print("Positional Embedding final output:", file=debug_file)
+            print("Positional Embedding final output: (size:"+str(x.size())+")", file=debug_file)
             print(x, file=debug_file)
 
         y = self.token(sequence)
         if debug_file is not None:
-            print("Token Embedding final output:", file=debug_file)
+            print("Token Embedding final output: (size:"+str(y.size())+")", file=debug_file)
             print(y, file=debug_file)
 
         # if self.is_logkey:
@@ -55,18 +55,19 @@ class BERTEmbedding(nn.Module):
             y = self.segment(segment_label)
             x = x + y
             if debug_file is not None:
-                print("Segment Embedding final output:", file=debug_file)
+                print("Segment Embedding final output: (size:"+str(y.size())+")", file=debug_file)
                 print(y, file=debug_file)
         if self.is_time:
             y = self.time_embed(time_info)
             x = x + y
             if debug_file is not None:
-                print("Time Embedding final output:", file=debug_file)
+                print("Time Embedding final output: (size:"+str(y.size())+")", file=debug_file)
                 print(y, file=debug_file)
 
         if debug_file is not None:
-            print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None)", file=debug_file)
-            print("%"+"-%"*60, file=debug_file)
+            print("Final Embedding = Positional Embedding + Token Embedding + Segment Embedding (if not None) + Time Embedding (if not None) : (size:"+str(x.size())+")", file=debug_file)
+            print(x, file=debug_file)
             print("returning dropout(final_out)", file=debug_file)
+            print("%"+"-%"*60, file=debug_file)
             print("", file=debug_file)
         return self.dropout(x)

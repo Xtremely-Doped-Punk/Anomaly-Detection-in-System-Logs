@@ -26,35 +26,39 @@ class MultiHeadedAttention(nn.Module):
         batch_size = query.size(0)
         if debug_file is not None:
             print("|-"*20+"...Multi-Headed Attention forward()..."+"-|"*20, file=debug_file)
-            print("inp query:",query, file=debug_file)
-            print("inp key:",key, file=debug_file)
-            print("inp value:",value, file=debug_file)
-            print("inp mask:",mask, file=debug_file)
+            print("inp query: (size:"+str(query.size())+")", file=debug_file)
+            print(query, file=debug_file)
+            print("inp key: (size:"+str(key.size())+")", file=debug_file)
+            print(key, file=debug_file)
+            print("inp value: (size:"+str(value.size())+")", file=debug_file)
+            print(value, file=debug_file)
+            print("inp mask: (size:"+str(mask.size())+")", file=debug_file)
+            print(mask, file=debug_file)
             print("batch_size:",batch_size, file=debug_file)
-            print("d_model (input total query vector size):", self.d_k * self.h, "\th (no.of heads):", self.h, "\td_k (dimension of small head query vector):", self.d_k, file=debug_file)
+            print("d_model (input total query vector size):", self.d_k * self.h, ",\th (no.of heads):", self.h, ",\td_k (dimension of small head query vector):", self.d_k, file=debug_file)
 
         # 1) Do all the linear projections in batch from d_model => h x d_k
         # view(params..,-1) will automatically calculate the dimension param given as '-1'
         # thus here, given a batch of queries,keys,values inputs, it need to be sliced into 
         # (batch_size X unknown_no_of_slices X no_of_heads X small_query_vec_size)
         if debug_file is not None:
-            print(">>> 1] Do all the linear projections in batch from d_model => h x d_k", file=debug_file)
+            print("\n>>> 1] Do all the linear projections in batch from d_model => h x d_k", file=debug_file)
             perm = 0
             for l, x in zip(self.linear_layers, (query, key, value)):
                 perm+=1
-                print(f"combination-{perm}: layer={l}, inp={x}", file=debug_file)
+                print(f"combination-{perm}: layer={l}, inp.shape={x.size()}", file=debug_file)
                 proj = l(x)
-                print("linear projection, i.e., l(x) =", proj, file=debug_file)
+                print("linear projection, i.e., l(x)'shape =", proj.size(), file=debug_file)
                 view_proj = proj.view(batch_size, -1, self.h, self.d_k)
-                print("view in slicable heads:", view_proj, file=debug_file)
-                print("transposing(1,2), new small head (Q,K,V) =", view_proj.transpose(1, 2), file=debug_file)
+                print("shape of view in slicable heads:", view_proj.size(), file=debug_file)
+                print("transposing dimension indices -> (1,2), thus new small heads h*(Qs,Ks,Vs) =", view_proj.transpose(1, 2).size(), file=debug_file)
 
         query, key, value = [l(x).view(batch_size, -1, self.h, self.d_k).transpose(1, 2)
                              for l, x in zip(self.linear_layers, (query, key, value))]
 
         # 2) Apply attention on all the projected vectors in batch.
         if debug_file is not None:
-            print(">>> 2] Apply attention on all the projected vectors in batch.", file=debug_file)
+            print("\n>>> 2] Apply attention on all the projected vectors in batch.", file=debug_file)
         
         '''
 link: https://stackoverflow.com/questions/55338756/why-there-are-different-output-between-model-forwardinput-and-modelinput
@@ -69,7 +73,7 @@ In this case, however, the difference may be due to some dropout layer, you shou
             print("Attention final output:", file=debug_file)
             print("Attention Weight Matrix:",x, file=debug_file)
             print("Softmax Scores:",attn, file=debug_file)
-            print(">>> 3] Concat and apply a final linear.", file=debug_file)
+            print("\n>>> 3] Concat and apply a final linear.", file=debug_file)
             print("transposing:",x.transpose(1, 2), file=debug_file)
 
         # 3) "Concat" using a view and apply a final linear.

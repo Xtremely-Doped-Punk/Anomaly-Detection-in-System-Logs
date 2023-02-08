@@ -134,8 +134,8 @@ class BERTTrainer:
         data_iter = enumerate(data_loader)
         
         if self.debug_file is not None:
-            self.debug_file.write(f"epoch:{epoch} --> {str_code} data" +"\n")
-            self.debug_file.write(f"learning_rate:{lr}, time:{time}" +"\n")
+            self.debug_file.write(f"epoch:{epoch+1} --> {str_code} data" +"\n")
+            self.debug_file.write(f"learning_rate:{lr}, start time:{start}" +"\n")
             self.debug_file.write(f"total len of data:{totol_length}, iterating through it batch-wise.." +"\n")
 
         total_loss = 0.0
@@ -145,13 +145,13 @@ class BERTTrainer:
         total_dist = []
         for i, data in data_iter:
             if self.debug_file is not None:
-                self.debug_file.write("@~"*20+"...[batch:"+str(i)+"] ..."+"~@"*20 +"\n")
+                self.debug_file.write("@~"*20+"... [batch:"+str(i)+"] ..."+"~@"*20 +"\n\n")
 
             data = {key: value.to(self.device) for key, value in data.items()}
 
             result = self.model.forward(data["bert_input"], data["time_input"], self.debug_file) # debug bertlog
             if self.debug_file is not None:
-                self.debug_file.write("BERTLog final output:" +"\n")
+                self.debug_file.write("BERTLog final output: (size:"+str(result.size())+")" +"\n")
                 self.debug_file.write(str(result) +"\n")
             mask_lm_output, mask_time_output = result["logkey_output"], result["time_output"]
 

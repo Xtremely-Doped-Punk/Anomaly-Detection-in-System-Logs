@@ -24,15 +24,16 @@ class BERTLog(nn.Module): # main parent model
     def forward(self, x, time_info, debug_file=None):
         if debug_file is not None:
             debug_file.write("#="*20+"...BERTLog forward()..."+"=#"*20 +"\n")
-            debug_file.write("bert_input:" +"\n")
+            debug_file.write("bert_input: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("time_input:" +"\n")
+            debug_file.write("time_input: (size:"+str(time_info.size())+")" +"\n")
             debug_file.write(str(time_info) +"\n")
+            print("", file=debug_file)
 
         x = self.bert(x, time_info=time_info, debug_file=debug_file)
 
         if debug_file is not None:
-            debug_file.write("BERT final output:" +"\n")
+            debug_file.write("BERT final output: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
             debug_file.write("Masked Log Model:"+str(self.mask_lm) +"\n")
 
@@ -45,10 +46,10 @@ class BERTLog(nn.Module): # main parent model
 
         # print(self.result["cls_fnn_output"].shape)
         if debug_file is not None:
-            debug_file.write("logkey_output:" +"\n")
+            debug_file.write("logkey_output: (size:"+str(self.result["logkey_output"].size())+")" +"\n")
             debug_file.write(str(self.result["logkey_output"]) +"\n")
             debug_file.write("#"+"=#"*60 +"\n")
-            debug_file.write("\n")
+            debug_file.write("\n\n\n")
         return self.result
 
 class MaskedLogModel(nn.Module):
@@ -74,14 +75,14 @@ class MaskedLogModel(nn.Module):
 
         x = self.linear(x)
         if debug_file is not None:
-            debug_file.write("linear projection:" +"\n")
+            debug_file.write("linear projection: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
 
         x = self.softmax(x)
         if debug_file is not None:
-            debug_file.write("softmax probabilities:" +"\n")
+            debug_file.write("softmax probabilities: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("\n")
+            debug_file.write("\n\n")
         return x
 
 
@@ -93,12 +94,14 @@ class TimeLogModel(nn.Module):
     def forward(self, x, debug_file=None):
         if debug_file is not None:
             debug_file.write("TimeLogModel forward() returns just the liner projection of prev hidden layer to vocab_size" +"\n")
+            debug_file.write("input weight:" +"\n")
+            debug_file.write(str(x) +"\n")
         
         x = self.linear(x)
         if debug_file is not None:
-            debug_file.write("linear projection:" +"\n")
+            debug_file.write("linear projection: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("\n")
+            debug_file.write("\n\n")
         return x
 
 class LogClassifier(nn.Module):

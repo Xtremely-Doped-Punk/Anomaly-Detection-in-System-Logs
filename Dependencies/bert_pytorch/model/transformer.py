@@ -28,20 +28,24 @@ class TransformerBlock(nn.Module):
     def forward(self, x, mask, debug_file=None):
         if debug_file is not None:
             print("^*"*20+"...Transformer Block forward()..."+"*^"*20, file=debug_file)
-            print("input:",x, file=debug_file)
-            print("input mask:", mask, file=debug_file)
+            print("input: (size:"+str(x.size())+")", file=debug_file)
+            print(x, file=debug_file)
+            print("input mask: (size:"+str(x.size())+")",  file=debug_file)
+            print(mask, file=debug_file)
+            print("",file=debug_file)
+
         x = self.input_sublayer(x, lambda _x: self.attention.forward(_x, _x, _x, mask=mask,debug_file=debug_file))
-        
         if debug_file is not None:
             print("Input Sublayer Connection final output:", file=debug_file)
             print(x, file=debug_file)
+            print("",file=debug_file)
+
         x = self.output_sublayer(x, self.feed_forward)
-        
         if debug_file is not None:
             print("Output Sublayer Connection final output:", file=debug_file)
             print(x, file=debug_file)
             print("returning dropout(final_out)", file=debug_file)
             print("^"+"*^"*60, file=debug_file)
-            print("", file=debug_file)
+            print("\n", file=debug_file)
 
         return self.dropout(x)

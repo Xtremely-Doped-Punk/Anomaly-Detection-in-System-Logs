@@ -44,14 +44,18 @@ class BERT(nn.Module):
             print("input:",x, file=debug_file)
             print("input segment_info:",segment_info, file=debug_file)
             print("input time_info:",time_info, file=debug_file)
-            print("computed mask:",mask, file=debug_file)
+            print("computed mask: (size:"+str(x.size())+")", file=debug_file)
+            print(mask, file=debug_file)
+            print("", file=debug_file)
         
         # embedding the indexed sequence to sequence of vectors
         x = self.embedding(x, segment_info, time_info, debug_file=debug_file)
 
         if debug_file is not None:
-            print("BERT Embedding final output:", file=debug_file)
+            print("BERT Embedding final output: (size:"+str(x.size())+")", file=debug_file)
             print(x, file=debug_file)
+            print("now passing these embeddings and mask to list of transformer blocks one outputed to next...")
+            print("", file=debug_file)
             layer_no = 1
 
         # running over multiple transformer blocks
@@ -64,5 +68,5 @@ class BERT(nn.Module):
 
         if debug_file is not None:
             print("$"+"-$"*60, file=debug_file)
-            print("", file=debug_file)
+            print("\n", file=debug_file)
         return x

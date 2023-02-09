@@ -35,13 +35,16 @@ class PositionalEmbedding(nn.Module):
             #print(position, file=debug_file)
             print(f"div_term: (size:{div_term.size()})", file=debug_file)
             print(div_term, file=debug_file)
-            print(f"sine on shape: {pe[:, 0::2].size()}", file=debug_file)
-            print(f"cosine on shape: {pe[:, 1::2].size()}", file=debug_file)
-        
+            print("(position * div_term).shape:",(position * div_term).size(), file=debug_file)
 
         pe[:, 0::2] = torch.sin(position * div_term)
+        if debug_file is not None:
+            print(f"sine on shape: {pe[:, 0::2].size()}", file=debug_file)
+
         pe[:, 1::2] = torch.cos(position * div_term)
         if debug_file is not None:
+
+            print(f"cosine on shape: {pe[:, 1::2].size()}", file=debug_file)
             print(f"sine on 1st half and cosine on 2nd half, finally 'pe': (size:{pe.shape})", file=debug_file)
             print(pe, file=debug_file)
 

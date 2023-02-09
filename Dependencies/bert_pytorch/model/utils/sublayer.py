@@ -36,6 +36,7 @@ class SublayerConnection(nn.Module):
             print(f"finally adding the initial inp ('x') with output obtained in prev layer ('y') as a residual connection, i.e. (x+y).shape: {z.size()}", file=debug_file)
             #print(x, file=debug_file)
             print("||"+"=||"*40, file=debug_file)
+            print("\n", file=debug_file)
 
         return z 
         #return x + self.dropout(sublayer(self.norm(x)))

@@ -58,7 +58,7 @@ class Trainer():
         self.show_each_out = options["show_each_out"]
         if self.debug:
             self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H_%M_%S')+"].out",'w')
-            torch.set_printoptions(precision=3)
+            torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")
 
 
         print("Save options parameters")

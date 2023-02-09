@@ -22,8 +22,8 @@ class LayerNorm(nn.Module):
         if debug_file is not None:
             print(" -"*20+"...LayerNorm forward()..."+"- "*20, file=debug_file)
             print("features:", self.features , file=debug_file)
-            print(f"a_2 (ones array of size:{self.features}):", self.a_2 , file=debug_file)
-            print(f"b_2 (zeros array of size:{self.features}):", self.b_2 , file=debug_file)
+            print(f"a_2 (ones array of size:{self.features})", file=debug_file)
+            print(f"b_2 (zeros array of size:{self.features})", file=debug_file)
             print("eps:", self.eps , file=debug_file)
             print("inp.shape:", x.size() , file=debug_file)
             print(f"calculating mean along last dim..., mean: (size:{mean.size()}", file=debug_file)

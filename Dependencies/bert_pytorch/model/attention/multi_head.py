@@ -58,7 +58,7 @@ class MultiHeadedAttention(nn.Module):
 
         # 2) Apply attention on all the projected vectors in batch.
         if debug_file is not None:
-            print("\n>>> 2] Apply attention on all the projected vectors in batch, layer:",self.attention, file=debug_file)
+            print("\n>>> 2] Apply attention on all the projected vectors in batch, layer:",self.attention,"\n", file=debug_file)
         
         '''
 link: https://stackoverflow.com/questions/55338756/why-there-are-different-output-between-model-forwardinput-and-modelinput

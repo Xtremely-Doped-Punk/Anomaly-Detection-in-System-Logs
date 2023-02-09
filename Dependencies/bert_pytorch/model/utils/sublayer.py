@@ -31,11 +31,11 @@ class SublayerConnection(nn.Module):
         if debug_file is not None:
             print(f"dropout layer: {self.dropout}; layer ('y')out.shape: {y.size()}", file=debug_file)
 
-        x += y
+        z = x + y
         if debug_file is not None:
-            print(f"finally adding the initial inp ('x') with output obtained in prev layer ('y') as a residual connection, i.e. (x+y).shape: {x.size()}", file=debug_file)
+            print(f"finally adding the initial inp ('x') with output obtained in prev layer ('y') as a residual connection, i.e. (x+y).shape: {z.size()}", file=debug_file)
             #print(x, file=debug_file)
             print("||"+"=||"*40, file=debug_file)
 
-        return x
-        # return x + self.dropout(sublayer(self.norm(x)))
+        return z 
+        #return x + self.dropout(sublayer(self.norm(x)))

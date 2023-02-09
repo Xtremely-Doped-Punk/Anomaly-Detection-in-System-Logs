@@ -157,9 +157,7 @@ class Trainer():
             print('x--x '*20)
         for epoch in range(self.epochs):
             if self.debug:
-                epoch_print = "\n<<< "+("="*30)+"epoch:"+str(epoch+1)+("="*30)+" >>>"
-                print(epoch_print)
-                self.debug_file.write(epoch_print+"\n")
+                print("\n<<<","="*30,"epoch:"+str(epoch+1),"="*30,">>>")
                 if epoch == 0:
                     print("debugging logbert trainer for only one epoch...")
             print("\n")

@@ -134,7 +134,7 @@ class BERTTrainer:
         data_iter = enumerate(data_loader)
         
         if self.debug_file is not None:
-            self.debug_file.write(f"epoch:{epoch+1} --> {str_code} data" +"\n")
+            self.debug_file.write("\n<<< "+("="*20)+f" epoch:{epoch+1} --> {str_code} data "+("="*20)+" >>>" +"\n")
             self.debug_file.write(f"learning_rate:{lr}, start time:{start}" +"\n")
             self.debug_file.write(f"total len of data:{totol_length}, iterating through it batch-wise.." +"\n")
 

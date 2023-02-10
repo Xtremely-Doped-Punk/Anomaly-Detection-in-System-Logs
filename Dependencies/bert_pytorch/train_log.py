@@ -62,7 +62,7 @@ class Trainer():
             self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H_%M_%S')+"].out",'w')
             torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")         
             if not self.debug_epochs:
-                    self.debug_file.write("only the first epoch will debugged as options['debug_every_epoch'] is set to false..." +"\n")
+                self.debug_file.write("debug_epochs is turned off, only first batch will debugged as an illustration..."+"\n")
 
 
         print("Save options parameters")
@@ -144,7 +144,7 @@ class Trainer():
             print("bert-trainner instance:",self.trainer)
             print("bert-trainner's final model:",self.trainer.model)
             print()
-            print(f"model training / validation debugging will be logged in a seperate file which will be generated in yout environment - \"{self.debug_file.name}\"")
+            print(f"model training / validation debugging will be logged in a seperate file - \"{self.debug_file.name}\"")
 
         self.start_iteration(surfix_log="log2")
 
@@ -161,16 +161,17 @@ class Trainer():
         # total_dist = None
         if self.debug:
             self.debug_file.write('x--x '*20 +"\n")
+            if not self.debug_epochs:
+                self.debug_file.write("only the first epoch will debugged as options['debug_every_epoch'] is set to false..." +"\n")
+
         for epoch in range(self.epochs):
-            if self.debug:
-                self.debug_file.write("\n<<<<<"+"="*25+" epoch:"+str(epoch+1)+" "+"="*25+">>>>>"+"\n")
-                if epoch == 0 and self.debug_epochs:
-                    self.debug_file.write("debugging logbert trainer for only one epoch..."+"\n\n")
+            if self.debug and (epoch==0 or self.debug_epochs):
+                self.debug_file.write("\n<<<<<"+"="*25+" epoch:"+str(epoch+1)+" "+"="*25+">>>>>\n")
            
             if self.hypersphere_loss:
-                if self.debug:
+                if self.debug and (epoch==0 or self.debug_epochs):
                     self.debug_file.write("calculating hypersphere loss:"+"\n")
-                center = self.calculate_center([self.train_data_loader, self.valid_data_loader])
+                center = self.calculate_center([self.train_data_loader, self.valid_data_loader], epoch=epoch)
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
 
@@ -180,16 +181,25 @@ class Trainer():
 
             self.trainer.save_log(self.model_dir, surfix_log)
 
-            if self.debug:
-                self.debug_file.write("epoch forward propagation training complete..."+"\n")
-                self.debug_file.write("avg_train_loss: "+str(avg_train_loss)+"  train_dist: "+str(train_dist)+"\n")
-                self.debug_file.write("avg_train_loss: "+str(avg_valid_loss)+"  valid_dist: "+str(valid_dist)+"\n")
+            if self.debug and (epoch==0 or self.debug_epochs):
+                self.debug_file.write("epoch train/valid propagation complete..."+"\n")
+
+                self.debug_file.write("\navg_train_loss:\n")
+                self.debug_file.write(str(avg_train_loss)+"\n")
+                self.debug_file.write("train_dist:\n")
+                self.debug_file.write(str(train_dist)+"\n")
+
+                self.debug_file.write("\navg_valid_loss:\n")
+                self.debug_file.write(str(avg_valid_loss)+"\n")
+                self.debug_file.write("valid_dist:\n")
+                self.debug_file.write(str(valid_dist)+"\n")
+
 
             if self.hypersphere_loss:
                 self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
-                if self.debug:
+                if self.debug and (epoch==0 or self.debug_epochs):
                     self.debug_file.write("new trainer.radius:"+str(self.trainer.radius)+"\n")
-                    if epoch == 0 and self.debug_epochs:
+                    if epoch == 0 and not self.debug_epochs:
                         self.trainer.debug_file = None # turn of trainner debug after 1st epoch
 
             if avg_valid_loss < best_loss:
@@ -203,16 +213,19 @@ class Trainer():
                 epochs_no_improve += 1
 
             if epochs_no_improve >= self.n_epochs_stop:
-                if self.debug:
-                    self.debug_file.write("\n")
-                print("Early stopping")
+                print("\nEarly stopping")
                 if self.save_override:
                     print("Saving Model even on Early stopping, save_hypersphere override...\n")
                     print("=-="*20)
                     self.trainer.save(self.model_path)
                     self.save_hypersphere(total_dist = train_dist + valid_dist)
                     print("=-="*20)
+                    print()
                 break
+
+            if self.debug and (epoch==0 or self.debug_epochs):
+                self.debug_file.write("\n\n\n\n\n")
+    
 
     def save_hypersphere(self, total_dist):
         best_center = self.trainer.hyper_center
@@ -229,7 +242,7 @@ class Trainer():
         print("save total dist: ", total_dist_path)
         torch.save(total_dist, total_dist_path)
 
-    def calculate_center(self, data_loader_list):
+    def calculate_center(self, data_loader_list,epoch=-1):
         self.debug_file.write("start calculate center" + ("" if not self.debug else " between the data_loader's: "+str(data_loader_list))+"\n")
         print("calculating hypershere center...")
         # model = torch.load(self.model_path)
@@ -238,14 +251,14 @@ class Trainer():
         with torch.no_grad(): # disabling the gradient calculation which reduces the memory consumption for computations
             outputs = 0
             total_samples = 0
-            if self.debug: 
+            if self.debug and (epoch==0 or self.debug_epochs): 
                 self.debug_file.write("iterating through the data_loader's..."+"\n")
                 self.debug_file.write("<--> "*20+"\n")
 
             for data_loader in data_loader_list:
                 totol_length = len(data_loader)
-                if self.debug:
-                    self.debug_file.write("\n","*-*"*30+"\n")
+                if self.debug and (epoch==0 or self.debug_epochs):
+                    self.debug_file.write("\n"+"*-*"*30+"\n")
                     self.debug_file.write("no.of batches: "+str(totol_length)+" as batch_size: "+str(data_loader.batch_size)+"\n")
                     self.debug_file.write("dataset_kind: "+str(data_loader._dataset_kind)+" => is iteratable kind: "+str(data_loader._dataset_kind==_DatasetKind.Iterable)+"\n")
                     self.debug_file.write("data_loader's dataset: "+str(data_loader.dataset)+"\n")
@@ -276,7 +289,7 @@ class Trainer():
                     outputs += torch.sum(cls_output.detach().clone(), dim=0)
                     total_samples += cls_output.size(0)
 
-        if self.debug:
+        if self.debug and (epoch==0 or self.debug_epochs):
             self.debug_file.write("<--> "*20 +"\n")
             self.debug_file.write("\n")
         if self.show_each_out:
@@ -286,7 +299,8 @@ class Trainer():
             print()
 
         center = outputs / total_samples
-        if self.debug:
+        print()
+        if self.debug and (epoch==0 or self.debug_epochs):
             self.debug_file.write("center calculated as sum of outputs by total no.of samples,i.e., average of all the result['cls_output']"+"\n")
         return center
 

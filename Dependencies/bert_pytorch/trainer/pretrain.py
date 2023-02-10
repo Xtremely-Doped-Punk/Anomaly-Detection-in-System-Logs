@@ -91,9 +91,8 @@ class BERTTrainer:
         self.is_time = is_time
         self.debug_file = debug_file
         self.debug_batchwise = debug_batchwise
-        if not self.debug_batchwise:
-            #self.debug_file.write("debug_batchwise is turned off, only first batch will debugged as an illustration..."+"\n")
-            self.debug_file.write("only the first batch will debugged as options['debug_every_batch'] is set to false..." +"\n")
+        if (self.debug_file is not None) and (not self.debug_batchwise):
+            self.debug_file.write("debug_batchwise is turned off, only first batch will debugged as an illustration..."+"\n")
         self.init_optimizer()
 
     def init_optimizer(self):
@@ -138,10 +137,11 @@ class BERTTrainer:
         data_iter = enumerate(data_loader)
         
         if check_debug:
-            self.debug_file.write("\n<<< "+("-"*20)+f" epoch:{epoch+1} --> {str_code} data "+("-"*20)+" >>>" +"\n")
+            self.debug_file.write("\n<<< "+("=-"*10)+f" epoch:{epoch+1} --> {str_code} data "+("-="*10)+" >>>" +"\n")
             self.debug_file.write(f"learning_rate:{lr}, start time:{start}" +"\n")
             self.debug_file.write(f"total len of data:{totol_length}, iterating through it batch-wise.." +"\n")
-                
+            if not self.debug_batchwise:
+                self.debug_file.write("only the first batch will debugged as options['debug_every_batch'] is set to false..." +"\n")           
 
 
         total_loss = 0.0
@@ -201,6 +201,12 @@ class BERTTrainer:
                 self.optim_schedule.zero_grad()
                 loss.backward()
                 self.optim_schedule.step_and_update_lr()
+
+            if check_debug and (i==0 or self.debug_batchwise):
+                self.debug_file.write("\n"+"@~"*15+" [batch:"+str(i+1)+" model.forward() & loss.backward() complete] "+"~@"*15 +"\n\n")
+        if check_debug:
+            self.debug_file.write("\n<<< "+("=-"*10)+f" epoch:{epoch+1} --> {str_code} data "+("-="*10)+" >>>" +"\n")
+            self.debug_file.write("\n\n\n")
 
         avg_loss = total_loss / totol_length
         self.log[str_code]['epoch'].append(epoch)

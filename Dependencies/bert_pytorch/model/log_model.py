@@ -49,7 +49,7 @@ class BERTLog(nn.Module): # main parent model
             debug_file.write("logkey_output: (size:"+str(self.result["logkey_output"].size())+")" +"\n")
             debug_file.write(str(self.result["logkey_output"]) +"\n")
             debug_file.write("#"+"=#"*60 +"\n")
-            debug_file.write("\n\n")
+            debug_file.write("\n")
         return self.result
 
 class MaskedLogModel(nn.Module):

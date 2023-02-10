@@ -205,8 +205,8 @@ class BERTTrainer:
             if check_debug and (i==0 or self.debug_batchwise):
                 self.debug_file.write("\n"+"@~"*15+" [batch:"+str(i+1)+" model.forward() & loss.backward() complete] "+"~@"*15 +"\n\n")
         if check_debug:
-            self.debug_file.write("\n<<< "+("=-"*10)+f" epoch:{epoch+1} --> {str_code} data "+("-="*10)+" >>>" +"\n")
-            self.debug_file.write("\n\n\n")
+            self.debug_file.write("\n<<< "+("=-"*10)+f" <<< epoch:{epoch+1} {str_code}.data complete >>> "+("-="*10)+" >>>" +"\n")
+            self.debug_file.write("\n\n")
 
         avg_loss = total_loss / totol_length
         self.log[str_code]['epoch'].append(epoch)

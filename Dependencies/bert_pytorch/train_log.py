@@ -224,8 +224,8 @@ class Trainer():
                 break
 
             if self.debug and (epoch==0 or self.debug_epochs):
-                self.debug_file.write("\n\n\n\n\n")
-    
+                self.debug_file.write("\n\n\n")
+
 
     def save_hypersphere(self, total_dist):
         best_center = self.trainer.hyper_center

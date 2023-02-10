@@ -58,11 +58,11 @@ class Trainer():
         self.show_each_out = options["show_each_out"]
         self.debug_epochs = options["debug_every_epoch"]
         self.debug_batchwise = options["debug_every_batch"]
-        if not self.debug_epochs:
-                self.debug_file.write("only the first epoch will debugged as options['debug_every_epoch'] is set to false..." +"\n")
         if self.debug:
             self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H_%M_%S')+"].out",'w')
-            torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")
+            torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")         
+            if not self.debug_epochs:
+                    self.debug_file.write("only the first epoch will debugged as options['debug_every_epoch'] is set to false..." +"\n")
 
 
         print("Save options parameters")
@@ -152,7 +152,8 @@ class Trainer():
 
     def start_iteration(self, surfix_log):
         print("Training Started")
-       self.debug_file.write("\nTraining Start"+"\n")
+        if self.debug:
+            self.debug_file.write("\nTraining Start"+"\n")
         best_loss = float('inf')
         epochs_no_improve = 0
         # best_center = None
@@ -162,7 +163,7 @@ class Trainer():
             self.debug_file.write('x--x '*20 +"\n")
         for epoch in range(self.epochs):
             if self.debug:
-                self.debug_file.write("\n<<<","="*30,"epoch:"+str(epoch+1),"="*30,">>>"+"\n")
+                self.debug_file.write("\n<<<<<"+"="*25+" epoch:"+str(epoch+1)+" "+"="*25+">>>>>"+"\n")
                 if epoch == 0 and self.debug_epochs:
                     self.debug_file.write("debugging logbert trainer for only one epoch..."+"\n\n")
            

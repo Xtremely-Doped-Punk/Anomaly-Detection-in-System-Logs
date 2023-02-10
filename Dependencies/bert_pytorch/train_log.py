@@ -56,6 +56,10 @@ class Trainer():
         self.save_override = options["save_on_early_stop"]
         self.show_each_inp = options["show_each_inp"]
         self.show_each_out = options["show_each_out"]
+        self.debug_epochs = options["debug_every_epoch"]
+        self.debug_batchwise = options["debug_every_batch"]
+        if not self.debug_epochs:
+                self.debug_file.write("only the first epoch will debugged as options['debug_every_epoch'] is set to false..." +"\n")
         if self.debug:
             self.debug_file = open("Train-DebugLog ["+datetime.now().strftime('%Y-%m-%d %H_%M_%S')+"].out",'w')
             torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")
@@ -127,63 +131,64 @@ class Trainer():
         print("Building BERT model")
         bert = BERT(len(vocab), max_len=self.max_len, hidden=self.hidden, n_layers=self.layers, attn_heads=self.attn_heads,
                     is_logkey=self.is_logkey, is_time=self.is_time)
-        if self.debug:
-            print("bert instance:",bert)
-            print()
 
         print("Creating BERT Trainer")
         self.trainer = BERTTrainer(bert, len(vocab), train_dataloader=self.train_data_loader, valid_dataloader=self.valid_data_loader,
                               lr=self.lr, betas=(self.adam_beta1, self.adam_beta2), weight_decay=self.adam_weight_decay,
                               with_cuda=self.with_cuda, cuda_devices=self.cuda_devices, log_freq=self.log_freq,
                               is_logkey=self.is_logkey, is_time=self.is_time,
-                              hypersphere_loss=self.hypersphere_loss, debug_file=self.debug_file)
+                              hypersphere_loss=self.hypersphere_loss, debug_file=self.debug_file, debug_batchwise=self.debug_batchwise)
         
         if self.debug:
-            print("bert-trainner instance:",self.trainer)
             print()
+            print("bert-trainner instance:",self.trainer)
+            print("bert-trainner's final model:",self.trainer.model)
+            print()
+            print(f"model training / validation debugging will be logged in a seperate file which will be generated in yout environment - \"{self.debug_file.name}\"")
 
         self.start_iteration(surfix_log="log2")
 
         self.plot_train_valid_loss("_log2")
 
     def start_iteration(self, surfix_log):
-        print("Training Start")
+        print("Training Started")
+       self.debug_file.write("\nTraining Start"+"\n")
         best_loss = float('inf')
         epochs_no_improve = 0
         # best_center = None
         # best_radius = 0
         # total_dist = None
         if self.debug:
-            print('x--x '*20)
+            self.debug_file.write('x--x '*20 +"\n")
         for epoch in range(self.epochs):
             if self.debug:
-                print("\n<<<","="*30,"epoch:"+str(epoch+1),"="*30,">>>")
-                if epoch == 0:
-                    print("debugging logbert trainer for only one epoch...")
-            print("\n")
+                self.debug_file.write("\n<<<","="*30,"epoch:"+str(epoch+1),"="*30,">>>"+"\n")
+                if epoch == 0 and self.debug_epochs:
+                    self.debug_file.write("debugging logbert trainer for only one epoch..."+"\n\n")
+           
             if self.hypersphere_loss:
                 if self.debug:
-                    print("calculating hypersphere loss:")
+                    self.debug_file.write("calculating hypersphere loss:"+"\n")
                 center = self.calculate_center([self.train_data_loader, self.valid_data_loader])
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
 
-            # model trainin will be debug logged into seperate file
+            # model training will be debug logged into seperate file
             avg_train_loss, train_dist = self.trainer.train(epoch)
             avg_valid_loss, valid_dist = self.trainer.valid(epoch)
 
             self.trainer.save_log(self.model_dir, surfix_log)
 
             if self.debug:
-                print("epoch training complete...")
-                print("avg_train_loss:",avg_train_loss,"train_dist:",train_dist)
-                print("avg_train_loss",avg_valid_loss,"valid_dist",valid_dist)
+                self.debug_file.write("epoch forward propagation training complete..."+"\n")
+                self.debug_file.write("avg_train_loss: "+str(avg_train_loss)+"  train_dist: "+str(train_dist)+"\n")
+                self.debug_file.write("avg_train_loss: "+str(avg_valid_loss)+"  valid_dist: "+str(valid_dist)+"\n")
 
             if self.hypersphere_loss:
                 self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
                 if self.debug:
-                    print("new trainer.radius:",self.trainer.radius)
-                    if epoch == 0:
+                    self.debug_file.write("new trainer.radius:"+str(self.trainer.radius)+"\n")
+                    if epoch == 0 and self.debug_epochs:
                         self.trainer.debug_file = None # turn of trainner debug after 1st epoch
 
             if avg_valid_loss < best_loss:
@@ -198,7 +203,7 @@ class Trainer():
 
             if epochs_no_improve >= self.n_epochs_stop:
                 if self.debug:
-                    print()
+                    self.debug_file.write("\n")
                 print("Early stopping")
                 if self.save_override:
                     print("Saving Model even on Early stopping, save_hypersphere override...\n")
@@ -224,8 +229,8 @@ class Trainer():
         torch.save(total_dist, total_dist_path)
 
     def calculate_center(self, data_loader_list):
-        showlis = "" if not self.debug else " between the data_loader's: "+str(data_loader_list)
-        print("start calculate center",showlis)
+        self.debug_file.write("start calculate center" + ("" if not self.debug else " between the data_loader's: "+str(data_loader_list))+"\n")
+        print("calculating hypershere center...")
         # model = torch.load(self.model_path)
         # model.to(self.device)
 
@@ -233,18 +238,18 @@ class Trainer():
             outputs = 0
             total_samples = 0
             if self.debug: 
-                print("iterating through the data_loader's...")
-                print("<--> "*20)
+                self.debug_file.write("iterating through the data_loader's..."+"\n")
+                self.debug_file.write("<--> "*20+"\n")
 
             for data_loader in data_loader_list:
                 totol_length = len(data_loader)
                 if self.debug:
-                    print("\n","*-*"*30)
-                    print("no.of batches:",totol_length,"as batch_size:",data_loader.batch_size)
-                    print("dataset_kind:",data_loader._dataset_kind, "=> is iteratable kind:", data_loader._dataset_kind == _DatasetKind.Iterable)
-                    print("data_loader's dataset:",data_loader.dataset)
-                    print("dataset_length:",len(data_loader.dataset), "=> _IterableDataset_len_called:",data_loader._IterableDataset_len_called, "\t is drop_last:",data_loader.drop_last)
-                    print()
+                    self.debug_file.write("\n","*-*"*30+"\n")
+                    self.debug_file.write("no.of batches: "+str(totol_length)+" as batch_size: "+str(data_loader.batch_size)+"\n")
+                    self.debug_file.write("dataset_kind: "+str(data_loader._dataset_kind)+" => is iteratable kind: "+str(data_loader._dataset_kind==_DatasetKind.Iterable)+"\n")
+                    self.debug_file.write("data_loader's dataset: "+str(data_loader.dataset)+"\n")
+                    self.debug_file.write("dataset_length: "+str(len(data_loader.dataset))+ " => _IterableDataset_len_called: "+str(data_loader._IterableDataset_len_called)+"\t is drop_last:"+str(data_loader.drop_last)+"\n")
+                    self.debug_file.write("\n")
                    
                 data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
 
@@ -270,21 +275,18 @@ class Trainer():
                     outputs += torch.sum(cls_output.detach().clone(), dim=0)
                     total_samples += cls_output.size(0)
 
-                if self.debug:
-                    print()
-
         if self.debug:
-            print("<--> "*20)
-            print()
+            self.debug_file.write("<--> "*20 +"\n")
+            self.debug_file.write("\n")
         if self.show_each_out:
-            print("final_outputs (sum of result['cls_output'] tensor):")
+            print("\nfinal_outputs (sum of result['cls_output'] tensor):")
             print(outputs)
             print("\ntotal_samples (no.of times):",total_samples)
             print()
 
         center = outputs / total_samples
         if self.debug:
-            print("center calculated as sum of outputs by total no.of samples,i.e., average of all the result['cls_output']")
+            self.debug_file.write("center calculated as sum of outputs by total no.of samples,i.e., average of all the result['cls_output']"+"\n")
         return center
 
     def plot_train_valid_loss(self, surfix_log):

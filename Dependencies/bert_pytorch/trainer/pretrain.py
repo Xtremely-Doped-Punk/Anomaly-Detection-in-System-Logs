@@ -25,7 +25,7 @@ class BERTTrainer:
                  train_dataloader: DataLoader, valid_dataloader: DataLoader = None,
                  lr: float = 1e-4, betas=(0.9, 0.999), weight_decay: float = 0.01, warmup_steps=10000,
                  with_cuda: bool = True, cuda_devices=None, log_freq: int = 10, is_logkey=True, is_time=False,
-                 hypersphere_loss=False, debug_file=None):
+                 hypersphere_loss=False, debug_file=None, debug_batchwise=False):
         """
         :param bert: BERT model which you want to train
         :param vocab_size: total word vocab size
@@ -90,7 +90,10 @@ class BERTTrainer:
         self.is_logkey = is_logkey
         self.is_time = is_time
         self.debug_file = debug_file
-
+        self.debug_batchwise = debug_batchwise
+        if not self.debug_batchwise:
+            #self.debug_file.write("debug_batchwise is turned off, only first batch will debugged as an illustration..."+"\n")
+            self.debug_file.write("only the first batch will debugged as options['debug_every_batch'] is set to false..." +"\n")
         self.init_optimizer()
 
     def init_optimizer(self):
@@ -121,6 +124,7 @@ class BERTTrainer:
         :param train: boolean value of is train or valid
         :return: None
         """
+        check_debug = self.debug_file is not None
         str_code = "train" if start_train else "valid"
         
         lr = self.optim.state_dict()['param_groups'][0]['lr']
@@ -133,10 +137,12 @@ class BERTTrainer:
         # data_iter = tqdm.tqdm(enumerate(data_loader), total=totol_length)
         data_iter = enumerate(data_loader)
         
-        if self.debug_file is not None:
+        if check_debug:
             self.debug_file.write("\n<<< "+("="*20)+f" epoch:{epoch+1} --> {str_code} data "+("="*20)+" >>>" +"\n")
             self.debug_file.write(f"learning_rate:{lr}, start time:{start}" +"\n")
             self.debug_file.write(f"total len of data:{totol_length}, iterating through it batch-wise.." +"\n")
+                
+
 
         total_loss = 0.0
         total_logkey_loss = 0.0
@@ -144,13 +150,13 @@ class BERTTrainer:
 
         total_dist = []
         for i, data in data_iter:
-            if self.debug_file is not None:
-                self.debug_file.write("@~"*20+"... [batch:"+str(i)+"] ..."+"~@"*20 +"\n\n")
+            if check_debug and (i==0 or self.debug_batchwise):
+                self.debug_file.write("\n"+"@~"*20+"... [batch:"+str(i+1)+"] ..."+"~@"*20 +"\n\n")
 
             data = {key: value.to(self.device) for key, value in data.items()}
 
             result = self.model.forward(data["bert_input"], data["time_input"], self.debug_file) # debug bertlog
-            if self.debug_file is not None:
+            if check_debug and (i==0 or self.debug_batchwise):
                 result_sizes = {key:value.size() for key, value in result.items() if value is not None}
                 self.debug_file.write("BERTLog final output: (size:"+str(result_sizes)+")" +"\n")
                 self.debug_file.write(str(result) +"\n")

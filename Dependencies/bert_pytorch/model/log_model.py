@@ -35,7 +35,7 @@ class BERTLog(nn.Module): # main parent model
         if debug_file is not None:
             debug_file.write("BERT final output: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("Masked Log Model:"+str(self.mask_lm) +"\n")
+            debug_file.write("\nMasked Log Model: "+str(self.mask_lm) +"\n\n")
 
         self.result["logkey_output"] = self.mask_lm(x,debug_file=debug_file)
         # self.result["time_output"] = self.time_lm(x,debug_file=debug_file)
@@ -82,7 +82,7 @@ class MaskedLogModel(nn.Module):
         if debug_file is not None:
             debug_file.write("softmax probabilities: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("\n\n")
+            debug_file.write("\n")
         return x
 
 
@@ -101,7 +101,7 @@ class TimeLogModel(nn.Module):
         if debug_file is not None:
             debug_file.write("linear projection: (size:"+str(x.size())+")" +"\n")
             debug_file.write(str(x) +"\n")
-            debug_file.write("\n\n")
+            debug_file.write("\n")
         return x
 
 class LogClassifier(nn.Module):

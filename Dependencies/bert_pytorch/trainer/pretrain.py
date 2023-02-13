@@ -63,7 +63,7 @@ class BERTTrainer:
         self.optim = None
         self.optim_schedule = None
 
-        # Using Negative Log Likelihood Loss function for predicting the masked_token
+        # Using Negative Log Likelihood Loss function for predicting the masked_token (same as Cross-Entropy Loss)
         self.criterion = nn.NLLLoss(ignore_index=0)
         self.time_criterion = nn.MSELoss()
         self.hyper_criterion = nn.MSELoss()

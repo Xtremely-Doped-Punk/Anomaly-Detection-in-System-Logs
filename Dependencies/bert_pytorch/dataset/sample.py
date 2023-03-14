@@ -113,7 +113,7 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
 
     print("before filtering short session")
     print("train size ", int(num_session - test_size))
-    print("valid size ", int(test_size))
+    print("valid size ", int(test_size),"\n")
     
     if debug:
         print()

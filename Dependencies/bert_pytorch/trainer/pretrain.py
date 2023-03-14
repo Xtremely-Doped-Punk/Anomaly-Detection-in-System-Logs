@@ -165,9 +165,9 @@ class BERTTrainer:
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens
             mask_loss = torch.tensor(0) if not self.is_logkey else self.criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
             total_logkey_loss += mask_loss.item()
-                if check_debug and (i==0 or self.debug_batchwise):
-                    self.debug_file.write(f"calculating logkey_loss after applying NLLLoss on inp.shape:{mask_lm_output.transpose(1, 2).size} , mapped to resp data_label {data["bert_label"]}" +"\n")
-                    self.debug_file.write("Log Key Loss: "+str(mask_loss.item())  +"\n")
+            if check_debug and (i==0 or self.debug_batchwise):
+                self.debug_file.write(f"calculating logkey_loss after applying NLLLoss on inp.shape:{mask_lm_output.transpose(1, 2).size} , mapped to resp data_label {data["bert_label"]}" +"\n")
+                self.debug_file.write("Log Key Loss: "+str(mask_loss.item())  +"\n")
 
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
             loss = mask_loss

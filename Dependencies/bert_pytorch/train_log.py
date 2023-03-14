@@ -63,6 +63,8 @@ class Trainer():
             torch.set_printoptions(precision=3, linewidth=120, edgeitems=5, profile="short")         
             if not self.debug_epochs:
                 self.debug_file.write("debug_epochs is turned off, only first batch will debugged as an illustration..."+"\n")
+        else:
+            self.debug_file = None
 
 
         print("Save options parameters")

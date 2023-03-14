@@ -64,7 +64,7 @@ class Trainer():
             if not self.debug_epochs:
                 self.debug_file.write("debug_epochs is turned off, only first batch will debugged as an illustration..."+"\n")
         else:
-            self.debug_file = None
+            self.debug_file = None24
 
 
         print("Save options parameters")
@@ -246,7 +246,8 @@ class Trainer():
         torch.save(total_dist, total_dist_path)
 
     def calculate_center(self, data_loader_list,epoch=-1):
-        self.debug_file.write("start calculate center" + ("" if not self.debug else " between the data_loader's: "+str(data_loader_list))+"\n")
+        if self.debug and (epoch==0 or self.debug_epochs): 
+            self.debug_file.write("start calculate center" + ("" if not self.debug else " between the data_loader's: "+str(data_loader_list))+"\n")
         print("calculating hypershere center...")
         # model = torch.load(self.model_path)
         # model.to(self.device)

@@ -7,7 +7,7 @@ from bert_pytorch.dataset.sample import generate_train_valid
 from bert_pytorch.dataset.utils import save_parameters
 
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 import pandas as pd
 import torch
 import tqdm
@@ -311,10 +311,14 @@ class Trainer():
     def plot_train_valid_loss(self, surfix_log):
         train_loss = pd.read_csv(self.model_dir + f"train{surfix_log}.csv")
         valid_loss = pd.read_csv(self.model_dir + f"valid{surfix_log}.csv")
-        sns.lineplot(x="epoch", y="loss", data=train_loss, label="train loss",markers=True,)
-        sns.lineplot(x="epoch", y="loss", data=valid_loss, label="valid loss",markers=True,)
-        plt.title("epoch vs train loss vs valid loss")
+        #sns.lineplot(x="epoch", y="loss", data=train_loss, label="train loss",markers=True,)
+        #sns.lineplot(x="epoch", y="loss", data=valid_loss, label="valid loss",markers=True,)
+        plt.plot(epoch,train_loss,'c-o',label='training loss')
+        plt.plot(epoch,valid_loss,'m-o',label='validation loss')
+        plt.set_title('Epoch vs Training & Validation loss')
         plt.legend()
+        plt.set_xlabel("Epochs")
+        plt.set_ylabel("Training & Validation Loss")
         plt.savefig(self.model_dir + "train_valid_loss.png")
         plt.show()
         print("plot done")

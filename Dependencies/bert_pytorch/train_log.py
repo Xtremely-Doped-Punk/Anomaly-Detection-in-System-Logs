@@ -198,6 +198,7 @@ class Trainer():
             if self.hypersphere_loss:
                 self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
                 if self.debug and (epoch==0 or self.debug_epochs):
+                    self.debug_file.write("train_dist + valid_dist ="+str(train_dist + valid_dist)+"\n")
                     self.debug_file.write("new trainer.radius:"+str(self.trainer.radius)+"\n")
                     if epoch == 0 and not self.debug_epochs:
                         self.trainer.debug_file = None # turn of trainner debug after 1st epoch

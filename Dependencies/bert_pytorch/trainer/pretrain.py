@@ -165,9 +165,9 @@ class BERTTrainer:
             # 2-2. NLLLoss of predicting masked token word ignore_index = 0 to ignore unmasked tokens
             mask_loss = torch.tensor(0) if not self.is_logkey else self.criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
             total_logkey_loss += mask_loss.item()
-            if check_debug and (i==0 or self.debug_batchwise):
-                self.debug_file.write(f"calculating logkey_loss after applying NLLLoss on inp.shape:{mask_lm_output.transpose(1, 2).size} , mapped to resp data_label {data["bert_label"]}" +"\n")
-                self.debug_file.write("Log Key Loss: "+str(mask_loss.item())  +"\n")
+                if check_debug and (i==0 or self.debug_batchwise):
+                    self.debug_file.write(f"calculating logkey_loss after applying NLLLoss on inp.shape:{mask_lm_output.transpose(1, 2).size} , mapped to resp data_label {data["bert_label"]}" +"\n")
+                    self.debug_file.write("Log Key Loss: "+str(mask_loss.item())  +"\n")
 
             # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
             loss = mask_loss
@@ -198,6 +198,11 @@ class BERTTrainer:
                 loss = loss + 0.1 * hyper_loss
 
             total_loss += loss.item()
+            if check_debug and (i==0 or self.debug_batchwise):
+                    self.debug_file.write(f"calculating hypersphere_loss after applying MSELoss on inp.shape:{result["cls_output"].squeeze().size} , mapped to resp data_label {self.hyper_center.expand(data["bert_input"].shape[0], -1)}" +"\n")
+                    self.debug_file.write("Hyper Loss: "+str(hyper_loss.item())  +"\n")
+                    self.debug_file.write("SVDD Distance (result['cls_output'] - hyper_center)^2 : "+str(dist.cpu().tolist())  +"\n")
+                    self.debug_file.write("With deepsvdd loss (10% incremental update): "+str(loss.item())  +"\n")
 
             # 3. backward and optimization only in train
             if start_train:
@@ -244,4 +249,8 @@ class BERTTrainer:
     @staticmethod
     def get_radius(dist: list, nu: float):
         """Optimally solve for radius R via the (1-nu)-quantile of distances."""
+        if self.debug_file is not None:
+            self.debug_file.write(f"calculating new radius for given dist:{dist} nu:{nu}"+"\n")
+            self.debug_file.write(f"sqrt of dist:{np.sqrt(dist)} (1-nu):{1-nu}"+"\n")
+            self.debug_file.write("returning radius for (1-nu)th quantile"+"\n")
         return np.quantile(np.sqrt(dist), 1 - nu)

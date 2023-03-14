@@ -275,7 +275,8 @@ class Predictor():
                     if self.debug:
                         print("detecting deepSVDD distance using hypersphere_loss...")
                         print("result['cls_output'] size:",result['cls_output'].size())
-                        print("dist:",dist.item())
+                        print("dist:",dist.item(),"\tdeepSVDD_label radius threshold:",self.radius)
+                        print("if dist < radius => normal else abnormal data")
 
 
                 if idx < 10 or idx % 1000 == 0:

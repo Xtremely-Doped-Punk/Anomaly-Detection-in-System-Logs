@@ -64,7 +64,7 @@ class Trainer():
             if not self.debug_epochs:
                 self.debug_file.write("debug_epochs is turned off, only first batch will debugged as an illustration..."+"\n")
         else:
-            self.debug_file = None24
+            self.debug_file = None
 
 
         print("Save options parameters")
@@ -198,7 +198,7 @@ class Trainer():
 
 
             if self.hypersphere_loss:
-                self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu)
+                self.trainer.radius = self.trainer.get_radius(train_dist + valid_dist, self.trainer.nu, self.debug_file)
                 if self.debug and (epoch==0 or self.debug_epochs):
                     self.debug_file.write("train_dist + valid_dist ="+str(train_dist + valid_dist)+"\n")
                     self.debug_file.write("new trainer.radius:"+str(self.trainer.radius)+"\n")

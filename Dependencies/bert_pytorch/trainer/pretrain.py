@@ -247,10 +247,10 @@ class BERTTrainer:
         return save_dir
 
     @staticmethod
-    def get_radius(dist: list, nu: float):
+    def get_radius(dist: list, nu: float, debug_file=None):
         """Optimally solve for radius R via the (1-nu)-quantile of distances."""
-        if self.debug_file is not None:
-            self.debug_file.write(f"calculating new radius for given dist:{dist} nu:{nu}"+"\n")
-            self.debug_file.write(f"sqrt of dist:{np.sqrt(dist)} (1-nu):{1-nu}"+"\n")
-            self.debug_file.write("returning radius for (1-nu)th quantile"+"\n")
+        if debug_file is not None:
+            debug_file.write(f"calculating new radius for given dist:{dist} nu:{nu}"+"\n")
+            debug_file.write(f"sqrt of dist:{np.sqrt(dist)} (1-nu):{1-nu}"+"\n")
+            debug_file.write("returning radius for (1-nu)th quantile"+"\n")
         return np.quantile(np.sqrt(dist), 1 - nu)

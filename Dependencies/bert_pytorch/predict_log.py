@@ -2,6 +2,7 @@ import numpy as np
 import scipy.stats as stats
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 import pickle
 import time
 import torch
@@ -284,7 +285,7 @@ class Predictor():
                         print("\nFINAL RESULT:", end=" ")
                     print(
                         "{}, #time anomaly: {} # of undetected_tokens: {}, # of masked_tokens: {} , "
-                        "# of total logkey {}, deepSVDD_label: {} \n".format(
+                        "# of total logkey {}, deepSVDD_label: {}".format(
                             file_name[:-5],
                             seq_results["num_error"],
                             seq_results["undetected_tokens"],
@@ -293,12 +294,14 @@ class Predictor():
                             seq_results['deepSVDD_label']
                         )
                     )
+
                 total_results.append(seq_results)
 
             if self.debug:
                 print('~'*75)
                 print()
         
+        print("\n")
         if self.debug:
             print("<<<<<->>>>>"*7)
             print()
@@ -357,11 +360,19 @@ class Predictor():
                 print("center:",self.center)
                 print()
 
+
+        prediction = []
+        labels = []
+
         print("test normal predicting")
         test_normal_results, test_normal_errors = self.helper(model, self.output_dir, "test_normal.data", vocab, scale, error_dict)
+        prediction.extend([i['deepSVDD_label'] for i in test_normal_results])
+        labels.extend(np.zeros(len(test_normal_results), dtype=int).tolist())
 
         print("test abnormal predicting")
         test_abnormal_results, test_abnormal_errors = self.helper(model, self.output_dir, "test_abnormal.data", vocab, scale, error_dict)
+        prediction.extend([i['deepSVDD_label'] for i in test_abnormal_results])
+        labels.extend(np.ones(len(test_abnormal_results), dtype=int).tolist())
 
         print("Saving test normal results")
         with open(self.model_dir + "test_normal_results", "wb") as f:
@@ -379,6 +390,8 @@ class Predictor():
         with open(self.model_dir + "test_abnormal_errors.pkl", "wb") as f:
             pickle.dump(test_abnormal_errors, f)
 
+        self.plot_confusion_matrix(prediction, labels)
+
         params = {"is_logkey": self.is_logkey, "is_time": self.is_time, "hypersphere_loss": self.hypersphere_loss,
                   "hypersphere_loss_test": self.hypersphere_loss_test}
         best_th, best_seq_th, FP, TP, TN, FN, P, R, F1 = find_best_threshold(test_normal_results,
@@ -394,3 +407,17 @@ class Predictor():
         print('elapsed_time: {}'.format(elapsed_time))
 
 
+    def plot_confusion_matrix(self, predicted_labels, actual_labels):
+        class_names = ["Normal","Anomaly"]
+        CM = confusion_matrix(actual_labels, predicted_labels)
+        plt.figure(figsize = (5,5))
+        plt.imshow(CM,interpolation='nearest',cmap='summer')
+        for (i, j), z in np.ndenumerate(CM):
+            plt.text(j, i, z, ha='center', va='center')
+        plt.title("Test-Data Confusion-Matrix")
+        plt.xticks(np.arange(len(class_names)),class_names, fontsize=10)
+        plt.yticks(np.arange(len(class_names)))
+        plt.grid(False)
+        plt.savefig(self.model_dir + "test_confusion_matrix.png")
+        plt.show()
+        print("plot done\n")

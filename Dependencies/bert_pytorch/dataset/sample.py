@@ -163,6 +163,7 @@ def generate_train_valid(data_path, window_size=20, adaptive_window=True,
     time_trainset = time_trainset[train_sort_index]
     time_validset = time_validset[valid_sort_index]
 
+    print()
     print("="*40)
     print("Num of train seqs", len(logkey_trainset))
     print("Num of valid seqs", len(logkey_validset))

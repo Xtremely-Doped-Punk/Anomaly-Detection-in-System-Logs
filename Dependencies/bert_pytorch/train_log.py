@@ -6,6 +6,7 @@ from bert_pytorch.dataset import LogDataset, WordVocab
 from bert_pytorch.dataset.sample import generate_train_valid
 from bert_pytorch.dataset.utils import save_parameters
 
+import numpy as np
 import matplotlib.pyplot as plt
 #import seaborn as sns
 import pandas as pd
@@ -313,12 +314,13 @@ class Trainer():
         valid_loss = pd.read_csv(self.model_dir + f"valid{surfix_log}.csv")
         #sns.lineplot(x="epoch", y="loss", data=train_loss, label="train loss",markers=True,)
         #sns.lineplot(x="epoch", y="loss", data=valid_loss, label="valid loss",markers=True,)
-        plt.plot(epoch,train_loss,'c-o',label='training loss')
-        plt.plot(epoch,valid_loss,'m-o',label='validation loss')
-        plt.set_title('Epoch vs Training & Validation loss')
+        epoch = np.arange(len(train_loss))
+        plt.plot(train_loss["epoch"], train_loss["loss"], 'c-o', label='training loss')
+        plt.plot(valid_loss["epoch"], valid_loss["loss"], 'm-o', label='validation loss')
+        plt.title('Epoch vs Training & Validation loss')
         plt.legend()
-        plt.set_xlabel("Epochs")
-        plt.set_ylabel("Training & Validation Loss")
+        plt.xlabel("Epochs")
+        plt.ylabel("Training & Validation Losses")
         plt.savefig(self.model_dir + "train_valid_loss.png")
         plt.show()
         print("plot done")
